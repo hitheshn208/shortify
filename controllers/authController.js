@@ -35,7 +35,7 @@ exports.signupPost = async (req, res)=>{
             sameSite: "strict"
         })
         console.log("Cookie set");
-        res.redirect("/");
+        res.redirect("/user/dashboard");
     }catch(e){
         console.log("Error ", e);
         res.send("Internal server Error ");
@@ -67,7 +67,7 @@ exports.loginpost = async (req, res)=>{
             sameSite: "strict"
         })
         console.log("Cookie set");
-        res.redirect("/");
+        res.redirect("/user/dashboard");
     }catch(e){
         console.log("Error ", e);
         res.send("Internal server Error ");
@@ -76,6 +76,6 @@ exports.loginpost = async (req, res)=>{
 
 exports.logoutUser = (req, res)=>{
     console.log("User logged out");
-    res.clearCookie("token")
-    return res.redirect("/auth/login");
+    res.clearCookie("token");
+    return res.redirect("/");
 }

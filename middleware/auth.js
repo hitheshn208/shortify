@@ -21,3 +21,16 @@ exports.authMiddleware = (req, res, next)=>{
     }
 
 }
+
+exports.checkAuth = (req, res, next)=>{
+    if(req.path !== "/") return next();
+
+    const token = req.cookies.token
+
+    if(token)
+    {
+        console.log("Redirecting to the dashboard")
+        return res.redirect("/user/dashboard");
+    }
+    next();
+}

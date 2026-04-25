@@ -1,27 +1,37 @@
 const express = require('express');
-const db = require('./config/database');
-const path = require("path");
 const cookieParser = require("cookie-parser");
-const {authMiddleware} = require("./middleware/auth")
-
-const authRouter = require("./routes/authRoutes");
-const userRoutes = require("./routes/userRoutes");
+const {authMiddleware, checkAuth} = require("./middleware/auth")
+const { redirectPage } = require("./controllers/urlController")
 
 const app = express();
-exports.app = app;
+const authRouter = require("./routes/authRoutes");
+const userRouter = require("./routes/userRoutes");
+const publicRouter = require("./routes/publicRoutes")
+
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static("public"));
 
+app.use((req, res, next)=>{
+    console.log("Request came to ", req.path, req.method);
+    next();
+})
+
+app.get("/favicon.ico", (req, res, next)=>{
+    res.status(204);
+})
+
 app.use("/auth", authRouter);
-app.use("/",authMiddleware, userRoutes);
+app.use("/user",authMiddleware, userRouter);
+app.get("/:code", redirectPage);
+app.use("/", checkAuth, publicRouter);
+
 
 app.use((req, res)=>{
-    res.send("<h1>Pagr not Found</h1>");
-})
+    res.send("<h1>Page not Found</h1>");
+});
 
 const PORT = 3000;
 app.listen(PORT, (e)=>{

@@ -1,9 +1,9 @@
 const express = require("express");
-const {showHomepage, shortenUrl} = require("../controllers/userController")
+const {showDashboardpage, shortenUrl} = require("../controllers/userController")
 
 const userRoutes = express.Router();
 
-userRoutes.get("/", showHomepage)
+userRoutes.get("/dashboard", showDashboardpage)
 userRoutes.post("/shorten", shortenUrl)
 
 module.exports = userRoutes;

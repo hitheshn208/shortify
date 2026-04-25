@@ -1,15 +1,34 @@
 const path = require("path");
-exports.showHomepage = (req, res)=>{
-    res.sendFile(path.join(__dirname, "../views/homepage.html"))
+const { customAlphabet } = require("nanoid");
+const { checkCode, registerCode, findUserById, fetchAllUrls, fetchOriginalUrl } = require("../model/userModel")
+
+exports.showDashboardpage = async (req, res)=>{
+    const user = await findUserById(req.id);
+    const urls = await fetchAllUrls(req.id);
+    res.render("dashboard", {
+        user,
+        urls
+    })
 }
 
-exports.shortenUrl = (req, res)=>{
+const nanoid = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 6);
+const getUniqueCode = async ()=>{
+    let shortCode;
+    do{
+        shortCode = nanoid();
+    }while(await checkCode(shortCode));
+    return shortCode;
+}
+
+exports.shortenUrl = async (req, res)=>{
     console.log("User Id to shorten ", req.id);
     console.log(req.body);
     const { originalUrl } = req.body;
-    const shortUrl = "http://localhost:3000/nnadq"
+    const shortCode = await getUniqueCode();
+    await registerCode(req.id, originalUrl, shortCode);
+    // const shortUrl = `http://localhost:3000/${shortCode}`;
     res.json({
         originalUrl,
-        shortUrl
+        shortCode
     })
 }
