@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+</head>
+<body>
+    <h1>Welcome to Homepage</h1>
+    <input type="text" id="originalUrl"><br><br><button id="submitUrl">Submit</button>
+    <br><br><br><br>
+    <button><a href="/">Check The jwt</a></button>
+    <div id="container">
+    </div>
+    <button><a href="/auth/logout">Logout user</a></button>
+</body>
+<script>
+    const originalUrlInput = document.querySelector("#originalUrl");
+    const submitUrl = document.querySelector("#submitUrl");
+
+    submitUrl.addEventListener('click', async (e)=>{
+        if(originalUrlInput.value === "")
+            return;
+        const originalUrl = originalUrlInput.value;
+
+        const response = await fetch("/shorten", {
+            method: "POST",
+            headers: {
+                "Content-Type" : "application/json"
+            },
+            body : JSON.stringify({
+                originalUrl
+            })
+        })
+
+        const result = await response.json();
+
+        const div = document.createElement("div");
+        div.innerHTML = `
+        <a href="${result.originalUrl}">Original</a>&nbsp;&nbsp;&nbsp;
+        <a href="${result.shortUrl}">${result.shortUrl}</a>`
+
+        document.querySelector("#container").appendChild(div);
+    })
+
+</script>
+</html>
