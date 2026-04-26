@@ -25,10 +25,11 @@ exports.shortenUrl = async (req, res)=>{
     console.log(req.body);
     const { originalUrl } = req.body;
     const shortCode = await getUniqueCode();
-    await registerCode(req.id, originalUrl, shortCode);
+    const url = await registerCode(req.id, originalUrl, shortCode);
     // const shortUrl = `http://localhost:3000/${shortCode}`;
     res.json({
-        originalUrl,
-        shortCode
+        original_url: url.original_url,
+        short_code : url.short_code,
+        visit_count : url.visit_count
     })
 }

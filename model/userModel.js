@@ -32,7 +32,7 @@ exports.findUserById = async (id)=>{
 
 exports.fetchAllUrls = async (id)=>{
     try{
-        const result = await db.query("SELECT * FROM urls WHERE user_id = $1", [id]);
+        const result = await db.query("SELECT original_url, short_code, visit_count FROM urls WHERE user_id = $1", [id]);
         return result.rows;
     }catch(e){
         console.log("Error while querying in fetchAllUrls", e);
@@ -56,8 +56,8 @@ exports.checkCode = async (shortCode)=>{
 
 exports.registerCode = async (userId, orginalUrl, shortCode) =>{
     try{
-        await db.query("INSERT INTO urls (user_id, original_url, short_code) VALUES ($1, $2, $3)", [userId, orginalUrl, shortCode]);
-        return;
+        const result = await db.query("INSERT INTO urls (user_id, original_url, short_code) VALUES ($1, $2, $3) RETURNING *", [userId, orginalUrl, shortCode]);
+        return result.rows[0];
     }catch(e){
         console.log("Error while querying in registerCode ", e);
         return;
@@ -66,7 +66,7 @@ exports.registerCode = async (userId, orginalUrl, shortCode) =>{
 
 exports.fetchOriginalUrl = async (shortCode)=>{
     try{
-        const result = await db.query("SELECT original_url FROM urls WHERE short_code = $1", [shortCode]);
+        const result = await db.query("UPDATE urls SET visit_count = visit_count + 1  WHERE short_code = $1 RETURNING original_url", [shortCode]);
         console.log(result.rows);
         return result.rows;
     }catch(e){
