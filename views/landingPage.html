@@ -22,7 +22,7 @@
                     <a href="#features">Features</a>
                     <a href="#how-it-works">How It Works</a>
                     <a href="#faq">FAQ</a>
-                    <a href="#" class="btn btn-primary" styles="color: white">Get Started</a>
+                    <a href="/auth/signup" class="btn btn-primary">Get Started</a>
                 </div>
                 <div class="mobile-menu-btn" id="mobileMenuBtn">
                     <span></span>
@@ -36,7 +36,7 @@
             <a href="#features">Features</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#faq">FAQ</a>
-            <a href="#" class="btn btn-primary">Get Started</a>
+            <a href="/auth/signup" class="btn btn-primary">Get Started</a>
         </div>
     </nav>
 
@@ -50,10 +50,10 @@
                 <p class="hero-subtitle">Create short, shareable links with auto-generated QR codes and optional password protection.</p>
                 <p class="hero-cta-hint">Access your links anytime from your personal dashboard.</p>
                 <div class="hero-buttons">
-                    <button class="btn btn-primary btn-large">Get Started Free</button>
+                    <a href="/auth/signup" style="color: white; text-decoration: none"><button class="btn btn-primary btn-large">Get Started Free</button></a>
                     <button class="btn btn-secondary btn-large">Learn More</button>
                 </div>
-                <p class="hero-signin-hint">Already have an account? <a href="#">Sign in here</a></p>
+                <p class="hero-signin-hint">Already have an account? <a href="/auth/login">Sign in here</a></p>
             </div>
             <div class="hero-visual">
                 <div class="link-animation">
@@ -78,55 +78,107 @@
             <h2 class="section-title reveal-item">Powerful Features</h2>
             <p class="section-subtitle reveal-item">Everything you need to manage your links effectively</p>
             
-            <div class="features-grid">
-                <!-- Feature 1: URL Shortening -->
-                <div class="feature-card reveal-item">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2m-4-4h6m-2-2l2 2-2 2"/>
-                        </svg>
-                    </div>
-                    <h3>Lightning-Fast Shortening</h3>
-                    <p>Turn lengthy URLs into memorable short links in one click. Share anywhere instantly.</p>
-                </div>
+            <div class="features-marquee reveal-item">
+                <div class="features-track">
+                    <div class="features-set">
+                        <!-- Feature 1: URL Shortening -->
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2m-4-4h6m-2-2l2 2-2 2"/>
+                                </svg>
+                            </div>
+                            <h3>Lightning-Fast Shortening</h3>
+                            <p>Turn lengthy URLs into memorable short links in one click. Share anywhere instantly.</p>
+                        </div>
 
-                <!-- Feature 2: QR Codes -->
-                <div class="feature-card reveal-item">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <rect x="7" y="7" width="3" height="3"/>
-                            <rect x="14" y="7" width="3" height="3"/>
-                            <rect x="7" y="14" width="3" height="3"/>
-                            <path d="M14 14v3h3"/>
-                        </svg>
-                    </div>
-                    <h3>Built-In QR Codes</h3>
-                    <p>Every link generates a QR code automatically. Perfect for offline campaigns and print.</p>
-                </div>
+                        <!-- Feature 2: QR Codes -->
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                    <rect x="7" y="7" width="3" height="3"/>
+                                    <rect x="14" y="7" width="3" height="3"/>
+                                    <rect x="7" y="14" width="3" height="3"/>
+                                    <path d="M14 14v3h3"/>
+                                </svg>
+                            </div>
+                            <h3>Built-In QR Codes</h3>
+                            <p>Every link generates a QR code automatically. Perfect for offline campaigns and print.</p>
+                        </div>
 
-                <!-- Feature 3: Click Counter -->
-                <div class="feature-card reveal-item">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2v4m5-1l-2.8 2.8m1 5h4m-1 5l-2.8-2.8m-5 1v4m-5-1l2.8-2.8M4 12H0"/>
-                        </svg>
-                    </div>
-                    <h3>Real-Time Click Tracking</h3>
-                    <p>Watch your link engagement instantly. See every click as it happens live.</p>
-                </div>
+                        <!-- Feature 3: Click Counter -->
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 12h3l2-5 4 10 2-5h7"/>
+                                </svg>
+                            </div>
+                            <h3>Real-Time Click Tracking</h3>
+                            <p>Watch your link engagement instantly. See every click as it happens live.</p>
+                        </div>
 
-                <!-- Feature 4: Password Protection -->
-                <div class="feature-card reveal-item">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                            <circle cx="12" cy="20" r="1"/>
-                        </svg>
+                        <!-- Feature 4: Password Protection -->
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                    <circle cx="12" cy="20" r="1"/>
+                                </svg>
+                            </div>
+                            <h3>Password-Protected Sharing</h3>
+                            <p>Keep sensitive links secure. Add optional password protection to any link.</p>
+                        </div>
                     </div>
-                    <h3>Password-Protected Sharing</h3>
-                    <p>Keep sensitive links secure. Add optional password protection to any link.</p>
+
+                    <div class="features-set" aria-hidden="true">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2m-4-4h6m-2-2l2 2-2 2"/>
+                                </svg>
+                            </div>
+                            <h3>Lightning-Fast Shortening</h3>
+                            <p>Turn lengthy URLs into memorable short links in one click. Share anywhere instantly.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                    <rect x="7" y="7" width="3" height="3"/>
+                                    <rect x="14" y="7" width="3" height="3"/>
+                                    <rect x="7" y="14" width="3" height="3"/>
+                                    <path d="M14 14v3h3"/>
+                                </svg>
+                            </div>
+                            <h3>Built-In QR Codes</h3>
+                            <p>Every link generates a QR code automatically. Perfect for offline campaigns and print.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 12h3l2-5 4 10 2-5h7"/>
+                                </svg>
+                            </div>
+                            <h3>Real-Time Click Tracking</h3>
+                            <p>Watch your link engagement instantly. See every click as it happens live.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                    <circle cx="12" cy="20" r="1"/>
+                                </svg>
+                            </div>
+                            <h3>Password-Protected Sharing</h3>
+                            <p>Keep sensitive links secure. Add optional password protection to any link.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -236,17 +288,13 @@
                                 <div class="stat-value">0</div>
                                 <div class="stat-label">Clicks</div>
                             </div>
-                            <div class="stat-preview">
-                                <div class="stat-value">Jan 1</div>
-                                <div class="stat-label">Created</div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="demo-cta reveal-item">
                 <p>Get full access to create, customize, and track all your links.</p>
-                <button class="btn btn-primary">Sign In or Create Account</button>
+                <a href="/auth/signup"><button class="btn btn-primary">Sign In or Create Account</button></a>
             </div>
         </div>
     </section>
@@ -340,7 +388,7 @@
         <div class="container">
             <h2>Ready to shorten your links?</h2>
             <p>Start creating short, secure links with QR codes in seconds. It's free to get started.</p>
-            <button class="btn btn-primary btn-large">Get Started Now</button>
+            <button class="btn btn-large">Get Started Now</button>
         </div>
     </section>
 

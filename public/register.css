@@ -5,23 +5,40 @@
 }
 
 :root {
-  --primary-bg: #ffffff;
-  --secondary-accent: #6366f1;
-  --text-main: #1a1a1a;
-  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --font: "Poppins", sans-serif;
+  --primary-blue: #0f63dc;
+  --primary-indigo: #0b4fc2;
+  --primary-cyan: #2ca8ff;
+  --ink-900: #111827;
+  --text-gray: #4b5563;
+  --border-gray: #dbe5f2;
+  --white: #ffffff;
+  --font-sans: 'Manrope', 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'Manrope', sans-serif;
 }
 
 body {
+  position: relative;
   background-image: url(./assets/login\ background\ illustration.png);
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: left center;
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
   overflow: hidden;
+  font-family: var(--font-sans);
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(44, 168, 255, 0.26), transparent 34%),
+    radial-gradient(circle at 82% 22%, rgba(15, 99, 220, 0.18), transparent 38%),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+  pointer-events: none;
 }
 
 .cover {
@@ -30,18 +47,20 @@ body {
 
 .register-container {
   position: relative;
-  background: linear-gradient(135deg, #6365f1, #4e46e5);
-  width: 40%;
-  height: 100%;
-  font-family: var(--font);
-  color: white;
+  z-index: 1;
+  width: min(460px, 100%);
+  min-height: 100vh;
+  color: var(--ink-900);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+  padding: 2rem 1.6rem;
   transform: translateX(0px);
-  /* animation: containerSlide normal 1s ease; */
+  border-left: 1px solid rgba(255, 255, 255, 0.62);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.9) 0%, rgba(243, 248, 255, 0.82) 52%, rgba(232, 240, 255, 0.82) 100%);
+  backdrop-filter: blur(14px);
+  box-shadow: -18px 0 45px rgba(14, 53, 116, 0.16);
 }
 
 @keyframes containerSlide {
@@ -62,107 +81,128 @@ body {
   align-items: center;
   gap: 10px;
   position: absolute;
-  top: 10px;
-  left: 30px;
+  top: 24px;
+  left: 28px;
 }
 
 .logoBar img {
-  width: 60px;
-  height: 60px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #e8f1ff, #d8e7ff);
+  border: 1px solid rgba(15, 99, 220, 0.24);
 }
 
 .logoBar p {
-  font-weight: 500;
-  font-size: 1.5rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--ink-900);
 }
 
 .register-container .mainHeading {
-  font-weight: 400;
-  letter-spacing: 0.75px;
-  font-size: 2.3rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-size: clamp(2rem, 4vw, 2.45rem);
+  color: var(--ink-900);
+  text-align: center;
 }
 
 .register-container .subHeading {
-  font-weight: 200;
-  font-size: small;
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 320px;
+  text-align: center;
+  color: var(--text-gray);
+  margin-top: 4px;
 }
 
 .register-container form {
   display: flex;
   flex-direction: column;
   padding: 0.5rem;
-  width: 75%;
+  width: min(360px, 92%);
   height: fit-content;
-  margin-top: 42px;
+  margin-top: 34px;
 }
 
 .register-container form label {
-  font-weight: 300;
-  margin-bottom: 5px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #244b86;
+  margin-bottom: 6px;
   margin-top: 1rem;
 }
 
 .register-container input {
-  background-color: #7e82f0;
-  color: white;
-  padding: 0.6rem;
-  border-radius: 10px;
+  background: var(--white);
+  color: var(--ink-900);
+  padding: 0.72rem 0.9rem;
+  border-radius: 12px;
   outline: none;
-  font-size: 0.9rem;
-  font-family: var(--font);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  caret-color: #ffffff;
-  cursor:pointer;
-  border: 1px solid rgba(255,255,255,0.2);
+  font-size: 0.92rem;
+  font-family: var(--font-sans);
+  box-shadow: 0 4px 12px rgba(14, 53, 116, 0.08);
+  caret-color: var(--primary-blue);
+  cursor: text;
+  border: 1px solid var(--border-gray);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .register-container input::placeholder {
-  color: rgba(255, 255, 255, 0.507);
+  color: #93a2b8;
+}
+
+.register-container input:focus {
+  border-color: rgba(15, 99, 220, 0.58);
+  box-shadow: 0 0 0 4px rgba(15, 99, 220, 0.14);
 }
 
 .register-container input:focus-visible,
 .register-container form button:focus-visible,
 .register-container .switchAuth a:focus-visible {
-  outline: 2px solid #ffffff;
+  outline: 2px solid var(--primary-blue);
   outline-offset: 2px;
 }
 
 .register-container form button {
-  padding: 0.6rem;
-  border-radius: 10px;
+  padding: 0.74rem;
+  border-radius: 12px;
   border: none;
-  background-color: white;
-  color: var(--primary-accent);
-  font-family: var(--font);
-  font-weight: 600;
+  color: var(--white);
+  font-family: var(--font-sans);
+  font-weight: 700;
   cursor: pointer;
   margin-top: 1.6rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  letter-spacing: 0.5px;
-  transition: 0.2s;
+  letter-spacing: 0.3px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   font-size: 1rem;
-  background: linear-gradient(135deg, #6C63FF, #5A54E8);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-indigo));
+  box-shadow: 0 12px 24px rgba(15, 99, 220, 0.28);
 }
 
 .register-container form button:hover {
-  transform: scale(1.01);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(15, 99, 220, 0.34);
 }
 
 .register-container form button:active {
-  transform: scale(1);
+  transform: translateY(0);
 }
 
 .register-container .switchAuth {
   margin-top: 1.25rem;
-  font-size: small;
-  font-weight: 200;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: #4b6288;
 }
 
 .register-container .switchAuth a {
-  color: white;
+  color: var(--primary-blue);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .register-container .switchAuth a:hover {
@@ -171,7 +211,7 @@ body {
 
 @media (max-width: 960px) {
   body {
-    background-image: none;
+    background-position: center;
     justify-content: center;
   }
 
@@ -182,6 +222,7 @@ body {
   .register-container {
     width: 100%;
     min-height: 100vh;
+    border-left: none;
   }
 
   .register-container form {
