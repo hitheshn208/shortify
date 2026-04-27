@@ -22,7 +22,7 @@ exports.registerUser = async (email, hashedPassword)=>{
 
 exports.findUserById = async (id)=>{
     try{
-        const result = await db.query("SELECT email FROM users WHERE id = $1", [id]);
+        const result = await db.query("SELECT name, email FROM users WHERE id = $1", [id]);
         return result.rows[0];
     }catch(e){
         console.log("Error while querying in findUserById", e);
@@ -32,7 +32,7 @@ exports.findUserById = async (id)=>{
 
 exports.fetchAllUrls = async (id)=>{
     try{
-        const result = await db.query("SELECT original_url, short_code, visit_count FROM urls WHERE user_id = $1", [id]);
+        const result = await db.query("SELECT original_url, short_code, visit_count, is_protected FROM urls WHERE user_id = $1", [id]);
         return result.rows;
     }catch(e){
         console.log("Error while querying in fetchAllUrls", e);
@@ -54,9 +54,10 @@ exports.checkCode = async (shortCode)=>{
     }
 }
 
-exports.registerCode = async (userId, orginalUrl, shortCode) =>{
+exports.registerCode = async (userId, orginalUrl, shortCode, passwordProtected, HashedPassword) =>{
     try{
-        const result = await db.query("INSERT INTO urls (user_id, original_url, short_code) VALUES ($1, $2, $3) RETURNING *", [userId, orginalUrl, shortCode]);
+
+        const result = await db.query("INSERT INTO urls (user_id, original_url, short_code, is_protected, url_password) VALUES ($1, $2, $3, $4, $5) RETURNING *", [userId, orginalUrl, shortCode, passwordProtected, HashedPassword]);
         return result.rows[0];
     }catch(e){
         console.log("Error while querying in registerCode ", e);
@@ -66,11 +67,19 @@ exports.registerCode = async (userId, orginalUrl, shortCode) =>{
 
 exports.fetchOriginalUrl = async (shortCode)=>{
     try{
-        const result = await db.query("UPDATE urls SET visit_count = visit_count + 1  WHERE short_code = $1 RETURNING original_url", [shortCode]);
-        console.log(result.rows);
+        const result = await db.query("SELECT original_url, is_protected, url_password FROM urls WHERE short_code = $1", [shortCode]);
         return result.rows;
     }catch(e){
         console.log("Error while querying in fetchOriginalUrl ", e);
+        return;
+    }
+}
+
+exports.updateClick = async (shortCode)=>{
+    try{
+        const result = await db.query("UPDATE urls SET visit_count = visit_count + 1 WHERE short_code = $1", [shortCode])
+    }catch(e){
+        console.log("Error while querying in updateClick ", e);
         return;
     }
 }

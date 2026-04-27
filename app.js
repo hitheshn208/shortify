@@ -7,6 +7,7 @@ const app = express();
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const publicRouter = require("./routes/publicRoutes")
+const urlRouter = require("./routes/urlRoutes")
 
 app.set("view engine", "ejs");
 app.use(express.json());
@@ -25,7 +26,7 @@ app.get("/favicon.ico", (req, res, next)=>{
 
 app.use("/auth", authRouter);
 app.use("/user",authMiddleware, userRouter);
-app.get("/:code", redirectPage);
+app.use("/:code", urlRouter);
 app.use("/", checkAuth, publicRouter);
 
 

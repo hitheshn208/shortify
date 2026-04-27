@@ -10,6 +10,8 @@ const elements = {
     passwordToggle: document.getElementById("passwordToggle"),
     passwordFieldWrap: document.getElementById("passwordFieldWrap"),
     linkPassword: document.getElementById("linkPassword"),
+    passwordVisibilityBtn: document.getElementById("passwordVisibilityBtn"),
+    passwordVisibilityIcon: document.getElementById("passwordVisibilityIcon"),
     formMessage: document.getElementById("formMessage"),
     createLinkBtn: document.getElementById("createLinkBtn"),
     linksContainer: document.getElementById("linksContainer"),
@@ -65,7 +67,26 @@ function togglePasswordField() {
     const isEnabled = elements.passwordToggle.checked;
     elements.passwordFieldWrap.classList.toggle("hidden", !isEnabled);
     elements.linkPassword.required = isEnabled;
-    if (!isEnabled) elements.linkPassword.value = "";
+    if (!isEnabled) {
+        elements.linkPassword.value = "";
+        elements.linkPassword.type = "password";
+        setPasswordVisibilityIcon(false);
+    }
+}
+
+function setPasswordVisibilityIcon(isVisible) {
+    if (!elements.passwordVisibilityIcon || !elements.passwordVisibilityBtn) return;
+    elements.passwordVisibilityIcon.src = isVisible
+        ? "/assets/visibility_off_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg"
+        : "/assets/visibility.svg";
+    elements.passwordVisibilityBtn.setAttribute("aria-label", isVisible ? "Hide password" : "Show password");
+}
+
+function togglePasswordVisibility() {
+    if (!elements.linkPassword) return;
+    const isVisible = elements.linkPassword.type === "text";
+    elements.linkPassword.type = isVisible ? "password" : "text";
+    setPasswordVisibilityIcon(!isVisible);
 }
 
 function openModal() {
@@ -105,22 +126,26 @@ function createLinkCard(urlItem) {
     if (!elements.linkCardTemplate) return;
 
     const cardNode = elements.linkCardTemplate.content.firstElementChild.cloneNode(true);
-    const linkTitle = cardNode.querySelector(".link-title");
+    const shortLinkAnchor = cardNode.querySelector(".short-link-anchor");
     const linkOriginal = cardNode.querySelector(".link-original");
     const lockBadge = cardNode.querySelector(".lock-badge");
     const clickCount = cardNode.querySelector(".click-count");
 
     const shortUrl = `${getBaseUrl()}/${urlItem.short_code}`;
-    const isProtected = Boolean(urlItem.password_hash || urlItem.is_password_protected || urlItem.password_protected);
+    const isProtected = Boolean(urlItem.is_protected);
 
-    linkTitle.textContent = shortUrl;
+    shortLinkAnchor.textContent = shortUrl;
+    shortLinkAnchor.href = `/${urlItem.short_code}`;
+    shortLinkAnchor.dataset.copyUrl = shortUrl;
     linkOriginal.textContent = urlItem.original_url;
 
     lockBadge.classList.add(isProtected ? "locked" : "unlocked");
-    lockBadge.textContent = isProtected ? "🔒 Protected" : "🔓 Public";
+    lockBadge.innerHTML = `
+        <span class="material-symbols-rounded lock-badge-icon">${isProtected ? "lock" : "lock_open"}</span>
+        <span>${isProtected ? "Protected" : "Public"}</span>
+    `;
     clickCount.textContent = `${toNumber(urlItem.visit_count)} Clicks`;
 
-    // TODO: adjust this path if your Link Details route is different.
     cardNode.dataset.detailUrl = `/user/links/${urlItem.short_code}`;
     return cardNode;
 }
@@ -139,6 +164,19 @@ function prependLinkCard(urlItem) {
 }
 
 function handleCardNavigation(event) {
+    const copyButton = event.target.closest(".short-link-copy-btn");
+    if (copyButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        copyCardShortLink(copyButton);
+        return;
+    }
+
+    const shortLinkAnchor = event.target.closest(".short-link-anchor");
+    if (shortLinkAnchor) {
+        return;
+    }
+
     const card = event.target.closest(".link-card");
     if (!card || !elements.linksContainer?.contains(card)) return;
 
@@ -148,6 +186,10 @@ function handleCardNavigation(event) {
 }
 
 function handleCardKeyboardNavigation(event) {
+    if (event.target.closest(".short-link-anchor") || event.target.closest(".short-link-copy-btn")) {
+        return;
+    }
+
     if (event.key !== "Enter" && event.key !== " ") return;
     const card = event.target.closest(".link-card");
     if (!card) return;
@@ -156,6 +198,26 @@ function handleCardKeyboardNavigation(event) {
     const detailUrl = card.dataset.detailUrl;
     if (!detailUrl) return;
     window.location.href = detailUrl;
+}
+
+async function copyCardShortLink(copyButton) {
+    const card = copyButton.closest(".link-card");
+    const shortLinkAnchor = card?.querySelector(".short-link-anchor");
+    const shortLink = shortLinkAnchor?.dataset.copyUrl || shortLinkAnchor?.textContent?.trim();
+    if (!shortLink) return;
+
+    try {
+        await navigator.clipboard.writeText(shortLink);
+        copyButton.classList.add("copied");
+        copyButton.setAttribute("aria-label", "Copied");
+        setTimeout(() => {
+            copyButton.classList.remove("copied");
+            copyButton.setAttribute("aria-label", "Copy short link");
+        }, 1200);
+    } catch (error) {
+        copyButton.setAttribute("aria-label", "Copy failed");
+        setTimeout(() => copyButton.setAttribute("aria-label", "Copy short link"), 1200);
+    }
 }
 
 function handleProfileToggle() {
@@ -229,7 +291,7 @@ async function createShortLink(event) {
 
     const originalUrl = elements.originalUrl.value.trim();
     const wantsPassword = Boolean(elements.passwordToggle?.checked);
-    const linkPassword = elements.linkPassword?.value.trim() || "";
+    const linkPassword = elements.linkPassword?.value.trim() || null;
 
     if (!originalUrl) {
         setFormMessage("Long URL is required.");
@@ -278,8 +340,6 @@ async function createShortLink(event) {
         togglePasswordField();
         setFormMessage("Link created successfully.", "success");
 
-        // TODO: backend currently returns { original_url, short_code, visit_count }.
-        // If you add password metadata in API response, lock badge can reflect it immediately.
     } catch (error) {
         setFormMessage("Could not create short link. Please try again.");
     } finally {
@@ -290,6 +350,7 @@ async function createShortLink(event) {
 
 function initEventListeners() {
     elements.passwordToggle?.addEventListener("change", togglePasswordField);
+    elements.passwordVisibilityBtn?.addEventListener("click", togglePasswordVisibility);
     elements.createLinkForm?.addEventListener("submit", createShortLink);
     elements.myLinksNavBtn?.addEventListener("click", smoothScrollToMyLinks);
 
@@ -313,6 +374,7 @@ function initEventListeners() {
 
 function init() {
     togglePasswordField();
+    setPasswordVisibilityIcon(false);
     resetQrUi();
     initEventListeners();
 }

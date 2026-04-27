@@ -67,13 +67,23 @@
 
                     <div id="passwordFieldWrap" class="password-field-wrap hidden">
                         <label for="linkPassword">Link password</label>
-                        <input
-                            type="password"
-                            id="linkPassword"
-                            name="linkPassword"
-                            placeholder="Enter password"
-                            autocomplete="new-password"
-                        >
+                        <div class="password-input-wrap">
+                            <input
+                                type="password"
+                                id="linkPassword"
+                                name="linkPassword"
+                                placeholder="Enter password"
+                                autocomplete="new-password"
+                            >
+                            <button
+                                type="button"
+                                id="passwordVisibilityBtn"
+                                class="password-visibility-btn"
+                                aria-label="Show password"
+                            >
+                                <img id="passwordVisibilityIcon" src="/assets/visibility.svg" alt="" aria-hidden="true">
+                            </button>
+                        </div>
                     </div>
 
                     <p id="formMessage" class="form-message" aria-live="polite"></p>
@@ -117,21 +127,35 @@
                 <div id="linksContainer" class="links-list">
                     <% if (urls.length) { %>
                         <% urls.forEach((url) => { %>
-                            <% const isProtected = Boolean(url.password_hash || url.is_password_protected || url.password_protected); %>
+                            <% const isProtected = url.is_protected %>
                             <% /* TODO: if your details route differs, replace data-detail-url generation accordingly */ %>
                             <article
                                 class="link-card"
                                 tabindex="0"
                                 role="button"
-                                data-detail-url="<%= url.details_url || ('/user/links/' + url.short_code) %>"
+                                data-detail-url="<%= `/${url.short_code}/details` %>"
                             >
                                 <div class="link-main">
-                                    <p class="link-title">http://localhost:3000/<%= url.short_code %></p>
+                                    <div class="short-link-row">
+                                        <a
+                                            class="link-title short-link-anchor"
+                                            href="/<%= url.short_code %>"
+                                            target = "_blank"
+                                            rel = "noopener noreferrer"
+                                            data-copy-url="http://localhost:3000/<%= url.short_code %>"
+                                        >
+                                            http://localhost:3000/<%= url.short_code %>
+                                        </a>
+                                        <button type="button" class="short-link-copy-btn" aria-label="Copy short link">
+                                            <span class="material-symbols-rounded">content_copy</span>
+                                        </button>
+                                    </div>
                                     <p class="link-original"><%= url.original_url %></p>
                                 </div>
                                 <div class="link-meta">
                                     <span class="lock-badge <%= isProtected ? 'locked' : 'unlocked' %>">
-                                        <%= isProtected ? '🔒 Protected' : '🔓 Public' %>
+                                        <span class="material-symbols-rounded lock-badge-icon"><%= isProtected ? 'lock' : 'lock_open' %></span>
+                                        <span><%= isProtected ? 'Protected' : 'Public' %></span>
                                     </span>
                                     <span class="click-count"><%= url.visit_count || 0 %> Clicks</span>
                                 </div>
@@ -171,7 +195,12 @@
     <template id="linkCardTemplate">
         <article class="link-card" tabindex="0" role="button" data-detail-url="">
             <div class="link-main">
-                <p class="link-title"></p>
+                <div class="short-link-row">
+                    <a class="link-title short-link-anchor" href="#" data-copy-url="" target = "_blank" rel = "noopener noreferrer"></a>
+                    <button type="button" class="short-link-copy-btn" aria-label="Copy short link">
+                        <span class="material-symbols-rounded">content_copy</span>
+                    </button>
+                </div>
                 <p class="link-original"></p>
             </div>
             <div class="link-meta">
