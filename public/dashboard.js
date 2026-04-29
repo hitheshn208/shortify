@@ -45,7 +45,7 @@ function setCopyFeedback(message = "") {
 }
 
 function getBaseUrl() {
-    return window.location.origin;
+    return "http://localhost:3000";
 }
 
 function toNumber(value) {
@@ -146,7 +146,7 @@ function createLinkCard(urlItem) {
     `;
     clickCount.textContent = `${toNumber(urlItem.visit_count)} Clicks`;
 
-    cardNode.dataset.detailUrl = `/user/links/${urlItem.short_code}`;
+    cardNode.dataset.detailUrl = `${getBaseUrl()}/${urlItem.short_code}/details`;
     return cardNode;
 }
 

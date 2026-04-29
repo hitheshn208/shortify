@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const { customAlphabet } = require("nanoid");
 const { checkCode, registerCode, findUserById, fetchAllUrls } = require("../model/userModel")
+const {hashPassword} = require("../utils/hashPassword");
 
 exports.showDashboardpage = async (req, res)=>{
     const user = await findUserById(req.id);
@@ -38,11 +39,4 @@ exports.shortenUrl = async (req, res)=>{
         visit_count : url.visit_count,
         is_protected : url.is_protected
     })
-}
-
-async function hashPassword(password){
-    console.log("Hashed Password")
-    const saltRound = 5;
-    const hashedPassword = await bcrypt.hash(password, saltRound);
-    return hashedPassword;
 }

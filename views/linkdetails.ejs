@@ -3,12 +3,288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Details</title>
+    <title><%= url.short_url %> - Shortify Link Details</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet">
+    <link rel="stylesheet" href="/linkdetails.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
-<body>
-    <% let obj = new URL(url.original_url);
-        let domain = obj.host;
-    %>
-    <img src="<%= `https://api.companyenrich.com/logo/${domain}` %>" alt="">
+<body
+    data-url-id="<%= url.id %>"
+    data-short-url="<%= url.short_url %>"
+    data-short-code="<%= url.short_code %>"
+    data-original-url="<%= url.original_url %>"
+    data-clicks="<%= url.visit_count|| 0 %>"
+    data-created-at="<%= url.created_at %>"
+    data-status="<%= url.status || 'Active' %>"
+    data-password-protected="<%= url.is_protected ? '1' : '0' %>"
+    data-user-name="<%= (typeof user !== 'undefined' && user && user.name) ? user.name : 'User Name' %>"
+    data-user-email="<%= (typeof user !== 'undefined' && user && user.email) ? user.email : '' %>"
+>
+    <header class="navbar">
+        <div class="top-strip" aria-hidden="true"></div>
+        <div class="container nav-content">
+            <a href="/user/dashboard" class="logo" aria-label="Dashboard home">
+                <span class="logo-placeholder">LOGO</span>
+                <span class="brand-name">Shortify</span>
+            </a>
+
+            <div class="nav-actions">
+                <a href="/user/dashboard" class="nav-link-btn">Dashboard</a>
+
+                <div class="profile-menu-wrap">
+                    <button type="button" id="profileToggle" class="profile-toggle" aria-expanded="false" aria-controls="profileDropdown">
+                        <span class="material-symbols-rounded">account_circle</span>
+                    </button>
+
+                    <div id="profileDropdown" class="profile-dropdown" aria-hidden="true">
+                        <p class="profile-name"><%= (typeof user !== 'undefined' && user && user.name) ? user.name : 'User Name' %></p>
+                        <p class="profile-email"><%= (typeof user !== 'undefined' && user && user.email) ? user.email : '' %></p>
+                        <a class="btn btn-primary profile-logout" href="/auth/logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="link-details-container">
+        <!-- Header -->
+            <div class="link-header">
+            <h1>Link Details</h1>
+        </div>
+
+        <!-- SECTION 1: Main Link Card -->
+        <section class="card card-primary mark-section" data-section="1">
+            <div class="card-content">
+                <div class="link-header-row">
+                    <% let domain = new URL(url.original_url)
+                        if (domain.host) { 
+                        %>
+                        <img src="<%= `https://api.companyenrich.com/logo/${domain.host}` %>" alt="Website icon" class="website-favicon">
+                    <% } else { %>
+                        <span class="material-symbols-rounded favicon-placeholder">language</span>
+                    <% } %>
+                    
+                    <div class="link-info">
+                        <label class="label-small">Short URL</label>
+                        <div class="short-url-row">
+                            <h2 class="short-url-display" id="shortUrlDisplay"><a href="<%= url.short_url %>"><%= url.short_url %></a></h2>
+                            <button class="btn btn-icon btn-copy" id="copyBtn" title="Copy to clipboard" data-url="<%= url.short_url %>">
+                                <span class="material-symbols-rounded">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="originalUrl" class="label-small">Original URL</label>
+                    <input type="text" id="originalUrl" class="input-field" value="<%= url.original_url %>" placeholder="https://example.com" readonly>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" id="editUrlBtn">
+                        <span class="material-symbols-rounded">edit</span>
+                        Edit
+                    </button>
+                    <button class="btn btn-primary" id="saveUrlBtn" style="display: none;">
+                        <span class="material-symbols-rounded">save</span>
+                        Save
+                    </button>
+                    <button class="btn btn-secondary" id="cancelUrlBtn" style="display: none;">
+                        <span class="material-symbols-rounded">close</span>
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: QR Code & Stats (Two Cards) -->
+        <div class="cards-grid">
+            <!-- QR Code Card -->
+            <section class="card mark-section" data-section="2-left">
+                <div class="card-header">
+                    <h3>QR Code</h3>
+                </div>
+                <div class="card-content qr-content">
+                    <div id="qrCodeContainer"></div>
+                    
+                    <div class="qr-buttons">
+                        <button class="btn btn-secondary" id="downloadQrBtn">
+                            <span class="material-symbols-rounded">download</span>
+                            Download
+                        </button>
+                        <button class="btn btn-secondary" id="shareQrBtn">
+                            <span class="material-symbols-rounded">share</span>
+                            Share
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Card -->
+            <section class="card mark-section" data-section="2-right">
+                <div class="card-header">
+                    <h3>Link Statistics</h3>
+                </div>
+                <div class="card-content stats-content">
+                    <div class="stat-item">
+                        <div class="stat-label">Total Clicks</div>
+                        <div class="stat-value"><%= url.visit_count|| 0 %></div>
+                    </div>
+
+                    <div class="stat-item">
+                        <div class="stat-label">Created Date</div>
+                        <div class="stat-value stat-date">
+                            <script>
+                                document.write(new Date('<%= url.created_at %>').toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric' 
+                                }));
+                            </script>
+                        </div>
+                    </div>
+
+                    <div class="stat-item">
+                        <div class="stat-label">Status</div>
+                        <div class="badge badge-active">
+                            <span class="badge-dot"></span>
+                            <%= url.status || 'Active' %>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- SECTION 3: Security Settings -->
+        <section class="card mark-section" data-section="3">
+            <div class="card-header">
+                <h3>
+                    <span class="material-symbols-rounded">lock</span>
+                    Security Settings
+                </h3>
+            </div>
+            <div class="card-content security-content">
+                <div id="securitySetupView" class="security-view <%= url.is_protected ? 'hidden' : '' %>">
+                    <div class="security-row">
+                        <div class="security-info">
+                            <h4>Password Protection</h4>
+                            <p class="description">Require a password to access this link</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="passwordToggle" class="toggle-input" <%= url.is_protected ? 'checked' : '' %>>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div id="passwordField" class="password-field <%= url.is_protected ? '' : 'hidden' %>">
+                        <div class="form-group">
+                            <label for="passwordInput" class="label-small">Set Password</label>
+                            <div class="password-input-row">
+                                <input type="password" id="passwordInput" class="input-field" placeholder="Enter password">
+                                <button type="button" class="btn btn-icon" id="togglePasswordVisibility" title="Toggle password visibility">
+                                    <span class="material-symbols-rounded">visibility_off</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" id="saveSecurityBtn">
+                            <span class="material-symbols-rounded">save</span>
+                            Save Password
+                        </button>
+                    </div>
+                </div>
+
+                <div id="securityProtectedView" class="security-protected-view <%= url.is_protected ? '' : 'hidden' %>">
+                    <div class="security-protected-summary">
+                        <div class="security-info">
+                            <h4>Password Protected</h4>
+                            <p class="description">This link is currently protected by a password.</p>
+                        </div>
+                        <span class="badge badge-active">Protected</span>
+                    </div>
+
+                    <div class="security-action-buttons">
+                        <button class="btn btn-secondary" id="removePasswordBtn">
+                            <span class="material-symbols-rounded">lock_open</span>
+                            Remove Password
+                        </button>
+                        <button class="btn btn-primary" id="editPasswordBtn">
+                            <span class="material-symbols-rounded">edit</span>
+                            Edit Password
+                        </button>
+                    </div>
+
+                    <div id="editPasswordPanel" class="password-field hidden">
+                        <div class="form-group">
+                            <label for="editPasswordInput" class="label-small">New Password</label>
+                            <div class="password-input-row">
+                                <input type="password" id="editPasswordInput" class="input-field" placeholder="Enter new password">
+                                <button type="button" class="btn btn-icon" id="toggleEditPasswordVisibility" title="Toggle password visibility">
+                                    <span class="material-symbols-rounded">visibility_off</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="security-action-buttons security-edit-actions">
+                            <button class="btn btn-secondary" id="cancelEditPasswordBtn">Cancel</button>
+                            <button class="btn btn-primary" id="saveEditPasswordBtn">
+                                <span class="material-symbols-rounded">save</span>
+                                Save Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Danger Zone -->
+        <section class="card card-danger mark-section" data-section="4">
+            <div class="card-content">
+                <div class="danger-actions">
+                    <div class="danger-action">
+                        <div class="danger-info">
+                            <h4>Reset Click Count</h4>
+                            <p class="description">Reset the total clicks counter to zero</p>
+                        </div>
+                        <button class="btn btn-secondary" id="resetClicksBtn">
+                            <span class="material-symbols-rounded">refresh</span>
+                            Reset
+                        </button>
+                    </div>
+
+                    <div class="danger-action">
+                        <div class="danger-info">
+                            <h4>Delete Link</h4>
+                            <p class="description">Permanently delete this shortened link</p>
+                        </div>
+                        <button class="btn btn-danger" id="deleteLinkBtn">
+                            <span class="material-symbols-rounded">delete</span>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <h3 id="modalTitle">Confirm Action</h3>
+            <p id="modalMessage">Are you sure?</p>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+                <button class="btn btn-danger" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" style="display: none;"></div>
+
+    <script src="/js/linkdetails.js"></script>
 </body>
 </html>

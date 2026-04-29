@@ -1,5 +1,6 @@
-const { fetchOriginalUrl, updateClick } = require("../model/userModel");
+const { fetchOriginalUrl, updateClick, findUserById,fetchUrlPassword, fetchLinkDetails, updateOriginalUrl, updateSecurity, deleteUrl } = require("../model/userModel");
 const bcrypt = require("bcrypt");
+const {hashPassword} = require("../utils/hashPassword");
 
 exports.redirectPage = async (req, res, next)=>{
     const shortCode = req.params.code;
@@ -32,7 +33,7 @@ exports.verifyPassword = async (req, res)=>{
     const shortCode = req.params.code;
     const { password } = req.body;
     console.log("Came to verify ", password);
-    const availableUrls = await fetchOriginalUrl(shortCode);
+    const availableUrls = await fetchUrlPassword(shortCode);
     if(!availableUrls.length)
         return res.status(404).json({ message: "Link not found" });
 
@@ -57,13 +58,51 @@ exports.verifyPassword = async (req, res)=>{
         });
 }
 
-exports.showLinkDetails = async (req, res)=>{
+exports.showLinkDetails = async (req, res, next)=>{
     const shortCode = req.params.code;
-    const availableUrls = await fetchOriginalUrl(shortCode);
-    if(availableUrls.length === 0)
+    const userId = req.id;
+    const availableUrls = await fetchLinkDetails(shortCode);
+    const user = await findUserById(userId);
+    if(availableUrls.length === 0 || user === 'undefined')
         return next();
 
     const url = availableUrls[0];
-    url.short_code = shortCode;
-    res.render("linkdetails", {url});
+    url.short_url = `http://localhost:3000/${shortCode}`;
+    res.render("linkdetails", {url, user});
+}
+
+exports.editOriginalUrl = async (req, res)=>{
+    const { id , newUrl } = req.body;
+    try{
+        console.log("Came to edit")
+        await updateOriginalUrl(id, newUrl);
+        return res.sendStatus(204);
+    }catch(e){
+        console.log(e);
+        return res.sendStatus(400);
+    }
+}
+
+exports.editSecurity = async(req, res)=>{
+    const { id , isProtected, password } = req.body;
+
+    if(!isProtected)
+    {
+        await updateSecurity(id , isProtected, null);
+        return res.sendStatus(204);
+    }
+    const HashedPassword = await hashPassword(password);
+    await updateSecurity(id , isProtected, HashedPassword);
+    return res.sendStatus(204);
+}
+
+exports.removeUrl = async(req, res)=>{
+    const shortCode = req.params.code;
+    console.log(shortCode)
+    if(!shortCode)
+        res.sendStatus(400);
+    const row = await deleteUrl(shortCode);
+    console.log(row);
+    console.log("Success");
+    return res.sendStatus(204);
 }

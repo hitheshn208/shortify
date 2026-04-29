@@ -125,7 +125,9 @@
                 </div>
 
                 <div id="linksContainer" class="links-list">
-                    <% if (urls.length) { %>
+                    <% if (urls.length) { 
+                        urls.sort((a,b)=> (b.is_protected - a.is_protected) || (b.visit_count - a.visit_count))
+                        %>
                         <% urls.forEach((url) => { %>
                             <% const isProtected = url.is_protected %>
                             <% /* TODO: if your details route differs, replace data-detail-url generation accordingly */ %>

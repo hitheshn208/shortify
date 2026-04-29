@@ -67,7 +67,7 @@ exports.registerCode = async (userId, orginalUrl, shortCode, passwordProtected, 
 
 exports.fetchOriginalUrl = async (shortCode)=>{
     try{
-        const result = await db.query("SELECT original_url, is_protected, url_password FROM urls WHERE short_code = $1", [shortCode]);
+        const result = await db.query("SELECT original_url, is_protected FROM urls WHERE short_code = $1", [shortCode]);
         return result.rows;
     }catch(e){
         console.log("Error while querying in fetchOriginalUrl ", e);
@@ -80,6 +80,56 @@ exports.updateClick = async (shortCode)=>{
         const result = await db.query("UPDATE urls SET visit_count = visit_count + 1 WHERE short_code = $1", [shortCode])
     }catch(e){
         console.log("Error while querying in updateClick ", e);
+        return;
+    }
+}
+
+exports.fetchLinkDetails = async (shortCode)=>{
+    try{
+        const result = await db.query("SELECT id, original_url, short_code, is_protected, visit_count, created_at FROM urls WHERE short_code = $1", [shortCode]);
+        return result.rows;
+    }catch(e){
+        console.log("Error while querying in fetchOriginalUrl ", e);
+        return;
+    }
+}
+
+exports.fetchUrlPassword = async (shortCode)=> {
+    try{
+        const result = await db.query("SELECT original_url, url_password FROM urls WHERE short_code = $1", [shortCode]);
+        return result.rows;
+    }catch(e){
+        console.log("Error while querying in fetchUrlPassword ", e);
+        return;
+    }
+}
+
+exports.updateOriginalUrl = async (id, newUrl)=>{
+    try{
+        const result = await db.query("UPDATE urls SET original_url = $1 WHERE id = $2", [newUrl, id]);
+        console.log("UPDATED ", id);
+        return;
+    }catch(e){
+        console.log("Error while querying in updateOriginalUrl ", e);
+        return;
+    }
+}
+
+exports.updateSecurity = async (id, isProtected, password)=>{
+    try{
+        await db.query("UPDATE urls SET is_protected = $1, url_password = $2 WHERE id = $3 ", [isProtected, password, id]);
+    }catch(e){
+        console.log("Error while querying in updateSecurity ", e);
+        return;
+    }
+}
+
+exports.deleteUrl = async (shortcode)=>{
+    try{
+        const result = await db.query("DELETE FROM urls WHERE short_code = $1", [shortcode]);
+        return result.rows
+    }catch(e){
+        console.log("Error while querying in deleteUrl ", e);
         return;
     }
 }
