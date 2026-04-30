@@ -70,23 +70,29 @@
 .logo {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 0px;
     color: var(--ink-900);
     text-decoration: none;
 }
 
 .logo-placeholder {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
+    width: 25px;
+    height: 25px;
+    /* border-radius: 10px;
     border: 2px solid var(--primary-blue);
-    background: var(--primary-blue-light);
+    background: var(--primary-blue-light); */
     color: var(--primary-blue);
     font-size: 0.78rem;
     font-weight: 800;
     display: grid;
     place-items: center;
 }
+
+.logo-placeholder img{
+    width:100%;
+    height:100%;
+}
+
 
 .brand-name {
     font-family: var(--font-display);

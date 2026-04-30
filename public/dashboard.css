@@ -133,21 +133,26 @@ a {
 .logo {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 0px;
     color: var(--ink-900);
 }
 
 .logo-placeholder {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border-radius: 12px;
-    border: 2px solid var(--primary-blue);
-    background: var(--primary-blue-light);
-    color: var(--primary-blue);
+    /* border: 2px solid var(--primary-blue); */
+    /* background: var(--primary-blue-light);
+    color: var(--primary-blue); */
     font-size: 0.72rem;
     font-weight: 800;
     display: grid;
     place-items: center;
+}
+
+.logo-placeholder img{
+    width:100%;
+    height:100%;
 }
 
 .brand-name {

@@ -22,7 +22,7 @@ exports.signupPost = async (req, res)=>{
 
     if(availableUser.length !== 0){
         console.log("Already registered ",availableUser)
-        return res.redirect("/auth/login");
+        return res.status(401).json({ message: "This email is already registered. Please sign in instead." });
     }
 
     const hashedPassword = await hashPassword(password);
@@ -35,28 +35,29 @@ exports.signupPost = async (req, res)=>{
             sameSite: "strict"
         })
         console.log("Cookie set");
-        res.redirect("/user/dashboard");
+        return res.status(200).json({
+            message: "Account created successfully.",
+            redirectUrl: "/user/dashboard"
+        });
     }catch(e){
         console.log("Error ", e);
-        res.send("Internal server Error ");
+        return res.status(500).json({ message: "Internal server error." });
     }
 }
 
 exports.loginpost = async (req, res)=>{
-    console.log("Came to login post")
     const {email, password} = req.body;
-
     const availableUser = await findUserByEmail(email);
     if(availableUser.length === 0){
         console.log("No user")
-        return res.redirect("/auth/signup");
+        return res.status(401).json({ message: "No account found for this email. Please sign up first." });
     }
     const user = availableUser[0];
     console.log(user);
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if(!isMatch){
         console.log("Password mismatch");
-        return res.redirect("/auth/login");
+        return res.status(401).json({ message: "Incorrect password. Please try again." });
     }
 
     try{
@@ -67,15 +68,20 @@ exports.loginpost = async (req, res)=>{
             sameSite: "strict"
         })
         console.log("Cookie set");
-        res.redirect("/user/dashboard");
+        return res.status(200).json({
+            message: "Login successful.",
+            redirectUrl: "/user/dashboard"
+        });
     }catch(e){
         console.log("Error ", e);
-        res.send("Internal server Error ");
+        return res.status(500).json({ message: "Internal server error." });
     }
 }
 
 exports.logoutUser = (req, res)=>{
     console.log("User logged out");
     res.clearCookie("token");
-    return res.redirect("/");
+    return res.json({
+        redirectUrl: "/" 
+    })
 }

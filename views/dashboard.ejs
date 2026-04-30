@@ -15,7 +15,7 @@
     <header class="navbar">
         <div class="container nav-content">
             <a href="/user/dashboard" class="logo" aria-label="Dashboard home">
-                <span class="logo-placeholder">LOGO</span>
+                <span class="logo-placeholder"><img src="/assets/logo.png" alt="logo"></span>
                 <span class="brand-name">Shortify</span>
             </a>
 
@@ -32,7 +32,7 @@
                         <p class="profile-name"><%= user.name || 'User Name' %></p>
                         <% /* Current backend already provides user.email */ %>
                         <p class="profile-email"><%= user.email %></p>
-                        <a class="btn btn-primary profile-logout" href="/auth/logout">Logout</a>
+                        <button class="btn btn-primary profile-logout" id="logout">Logout</button>
                     </div>
                 </div>
             </div>
@@ -135,7 +135,7 @@
                                 class="link-card"
                                 tabindex="0"
                                 role="button"
-                                data-detail-url="<%= `/${url.short_code}/details` %>"
+                                data-detail-url="<%= `/user/${url.short_code}/details` %>"
                             >
                                 <div class="link-main">
                                     <div class="short-link-row">

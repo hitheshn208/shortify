@@ -30,7 +30,8 @@ const elements = {
     generateQrBtn: document.getElementById("generateQrBtn"),
     downloadQrBtn: document.getElementById("downloadQrBtn"),
     qrContainer: document.getElementById("qrContainer"),
-    linkCardTemplate: document.getElementById("linkCardTemplate")
+    linkCardTemplate: document.getElementById("linkCardTemplate"),
+    logout:  document.getElementById("logout")
 };
 
 function setFormMessage(message, type = "error") {
@@ -343,10 +344,26 @@ async function createShortLink(event) {
     } catch (error) {
         setFormMessage("Could not create short link. Please try again.");
     } finally {
+        setTimeout(()=>{
+            setFormMessage("");
+        }, 2000);
         elements.createLinkBtn.disabled = false;
         elements.createLinkBtn.textContent = "Create Short Link";
     }
 }
+
+async function logoutSession(e){
+    e.target.disabled = true;
+    e.target.textContent = "Logging out.."
+    const res = await fetch("/auth/logout");
+
+    const response = await res.json();
+    if(!response.ok){
+        e.target.disabled = false;
+        e.target.textContent = "Logout"
+    }
+    window.location.replace(response.redirectUrl);
+} 
 
 function initEventListeners() {
     elements.passwordToggle?.addEventListener("change", togglePasswordField);
@@ -370,6 +387,7 @@ function initEventListeners() {
 
     elements.copyBtn?.addEventListener("click", copyToClipboard);
     elements.generateQrBtn?.addEventListener("click", generateQrCode);
+    elements.logout?.addEventListener("click", logoutSession);
 }
 
 function init() {

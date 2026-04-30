@@ -194,7 +194,7 @@ a.btn.btn-primary,
 .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0px;
     font-weight: 700;
     font-size: 1.5rem;
     color: var(--ink-900);
@@ -203,15 +203,20 @@ a.btn.btn-primary,
 .logo-placeholder {
     width: 42px;
     height: 42px;
-    background: var(--primary-blue-light);
-    border: 2px solid var(--primary-blue);
-    border-radius: 12px;
+    /* background: var(--primary-blue-light); */
+    /* border: 2px solid var(--primary-blue); */
+    /* border-radius: 12px; */
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.75rem;
     font-weight: 700;
     color: var(--primary-blue);
+}
+
+.logo-placeholder img{
+    width: 100%;
+    height: 100%;
 }
 
 .brand-name {
@@ -1062,6 +1067,10 @@ a.btn.btn-primary,
 
 .cta .btn:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.cta a{
+    text-decoration: none;
 }
 
 /* ==================== FOOTER ==================== */
