@@ -3,7 +3,19 @@ let passwordvisibility, switchAuth;
 const authRoot = document.querySelector('#authRoot');
 const loginTemplate = document.querySelector('#loginTemplate');
 const registerTemplate = document.querySelector('#registerTemplate');
+const otpTemplate = document.querySelector('#otpTemplate');
+const nameTemplate = document.querySelector('#nameTemplate');
+// Frontend endpoints used by the multi-step signup flow:
+// POST /auth/signup            -> payload: { email, password }
+//    - Backend should send OTP to the provided email and respond with success.
+// POST /auth/verify-otp        -> payload: { email, otp }
+//    - Backend verifies OTP and responds with success if valid.
+// POST /auth/complete-profile  -> payload: { email, name }
+//    - Backend completes profile and returns { redirectUrl } (or 200).
+// Note: Google OAuth button is left as a no-op for now.
 let isPasswordVisible = false;
+let signupEmail = null;
+let pendingRegisterEmail = '';
 
 function getAuthMessageElement() {
     return document.querySelector('#authMessage');
@@ -79,7 +91,6 @@ async function submitAuthForm(form) {
             window.location.replace(responseData.redirectUrl || successRedirect);
             return;
         }
-
         showAuthMessage(message || 'Authentication failed. Please try again.', 'error');
     } catch (error) {
         showAuthMessage('Unable to submit the form right now. Please try again.', 'error');
@@ -96,6 +107,29 @@ function renderTemplate(template){
         return;
     }
     authRoot.innerHTML = template.innerHTML;
+}
+
+function populateOtpTemplate(email) {
+    if(!otpTemplate) return;
+    renderTemplate(otpTemplate);
+    setTimeout(() => {
+        const resolvedEmail = email || signupEmail || '';
+        const otpEmailInput = document.querySelector('#otpEmailInput');
+        const otpEmailText = document.querySelector('#otpEmailText');
+        if(otpEmailInput) otpEmailInput.value = resolvedEmail;
+        if(otpEmailText) otpEmailText.textContent = resolvedEmail || 'your email';
+        initialiseOTPPage();
+    }, 50);
+}
+
+function populateNameTemplate(email) {
+    if(!nameTemplate) return;
+    renderTemplate(nameTemplate);
+    setTimeout(() => {
+        const nameEmailInput = document.querySelector('#nameEmailInput');
+        if(nameEmailInput) nameEmailInput.value = email || signupEmail || '';
+        initialiseNamePage();
+    }, 50);
 }
 
 function togglePasswordVisibility(passwordField, visibilityButton) {
@@ -181,10 +215,11 @@ function initialiseRegisterPage() {
         return;
     }
 
+    // Register uses a custom flow: signup -> OTP -> name
     if(authForm) {
         authForm.addEventListener('submit', (event) => {
             event.preventDefault();
-            submitAuthForm(authForm);
+            submitSignupForm(authForm);
         });
     }
 
@@ -219,6 +254,15 @@ function populateRegister() {
     renderTemplate(registerTemplate);
     setTimeout(() => {
         initialiseRegisterPage();
+        if(pendingRegisterEmail) {
+            const emailInput = document.querySelector('#emailInput');
+            if(emailInput) {
+                emailInput.value = pendingRegisterEmail;
+                emailInput.focus();
+                emailInput.setSelectionRange(emailInput.value.length, emailInput.value.length);
+            }
+            pendingRegisterEmail = '';
+        }
     }, 50);
 }
 
@@ -227,4 +271,257 @@ if(authRoot && authRoot.dataset.isLogin === "true") {
     populateLogin();
 } else {
     populateRegister();
+}
+
+async function submitSignupForm(form) {
+    const endpoint = form.dataset.endpoint;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    showAuthMessage('');
+    if(submitButton) submitButton.disabled = true;
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const responseData = await readResponseData(response);
+        const message = responseData.message || responseData.error || '';
+
+        if(response.ok) {
+            // Expect backend to have sent OTP to email. Store email and show OTP step.
+            signupEmail = data.email || responseData.email || signupEmail;
+            showAuthMessage(message || 'OTP sent to your email', 'success');
+            populateOtpTemplate(signupEmail);
+            return;
+        }
+
+        showAuthMessage(message || 'Signup failed. Please try again.', 'error');
+    } catch (error) {
+        showAuthMessage('Unable to submit the form right now. Please try again.', 'error');
+    } finally {
+        if(submitButton) submitButton.disabled = false;
+    }
+}
+
+function initialiseOTPPage() {
+    const otpForm = document.querySelector('.otp-form');
+    const resendLink = document.querySelector('#resendOtp');
+    const resendTimer = document.querySelector('#resendTimer');
+    const backToRegisterButton = document.querySelector('#backToRegister');
+    const otpBoxes = document.querySelectorAll('.otp-box');
+    const otpCombinedInput = document.querySelector('#otpCombined');
+
+    // Start 2-minute (120 second) timer for resend
+    let resendCountdown = 120;
+    let timerInterval = null;
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(resendCountdown / 60);
+        const seconds = resendCountdown % 60;
+        const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if(resendTimer) {
+            if(resendCountdown > 0) {
+                resendTimer.textContent = `(${timeStr})`;
+                resendTimer.classList.remove('hidden');
+                if(resendLink) {
+                    resendLink.style.pointerEvents = 'none';
+                    resendLink.style.opacity = '0.5';
+                }
+            } else {
+                resendTimer.classList.add('hidden');
+                if(resendLink) {
+                    resendLink.style.pointerEvents = 'auto';
+                    resendLink.style.opacity = '1';
+                }
+            }
+        }
+    }
+
+    function startTimer() {
+        resendCountdown = 120;
+        updateTimerDisplay();
+        
+        timerInterval = setInterval(() => {
+            resendCountdown--;
+            updateTimerDisplay();
+            
+            if(resendCountdown <= 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }, 1000);
+    }
+
+    // Initialize timer on page load
+    startTimer();
+
+    // Setup 6-box OTP auto-focus and backspace
+    otpBoxes.forEach((box, index) => {
+        box.addEventListener('input', (e) => {
+            // Only allow digits
+            if(!/^\d$/.test(e.target.value)) {
+                e.target.value = '';
+                return;
+            }
+            
+            // Auto-focus next box
+            if(index < otpBoxes.length - 1 && e.target.value) {
+                otpBoxes[index + 1].focus();
+            }
+
+            // Update hidden input with combined OTP
+            const combined = Array.from(otpBoxes).map(b => b.value).join('');
+            if(otpCombinedInput) otpCombinedInput.value = combined;
+        });
+
+        box.addEventListener('keydown', (e) => {
+            // Backspace: move to previous box
+            if(e.key === 'Backspace' && !box.value && index > 0) {
+                otpBoxes[index - 1].focus();
+            }
+        });
+
+        box.addEventListener('focus', (e) => {
+            e.target.select();
+        });
+    });
+
+    if(otpForm) {
+        otpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const combined = Array.from(otpBoxes).map(b => b.value).join('');
+            
+            // Validate all 6 digits entered
+            if(combined.length !== 6) {
+                showAuthMessage('Please enter all 6 digits', 'error');
+                return;
+            }
+
+            const formData = new FormData(otpForm);
+            const data = Object.fromEntries(formData.entries());
+            data.otp = combined;
+            const endpoint = '/auth/verify-otp';
+
+            showAuthMessage('');
+            const submitButton = otpForm.querySelector('button[type="submit"]');
+            if(submitButton) submitButton.disabled = true;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const responseData = await readResponseData(response);
+                const message = responseData.message || responseData.error || '';
+
+                if(response.ok) {
+                    if(timerInterval) clearInterval(timerInterval);
+                    showAuthMessage(message || 'Verification successful', 'success');
+                    // Move to name step
+                    populateNameTemplate(data.email || signupEmail);
+                    return;
+                }
+
+                showAuthMessage(message || 'OTP verification failed', 'error');
+                // Clear boxes on failed verification
+                otpBoxes.forEach(b => b.value = '');
+                otpBoxes[0].focus();
+            } catch (err) {
+                showAuthMessage('Unable to verify OTP right now. Please try again.', 'error');
+            } finally {
+                if(submitButton) submitButton.disabled = false;
+            }
+        });
+    }
+
+    if(resendLink) {
+        resendLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            // Prevent resend if timer is still running
+            if(resendCountdown > 0) {
+                return;
+            }
+
+            // Call resend endpoint
+            try {
+                const resp = await fetch('/auth/signup/resend-otp', {
+                    method: 'POST',
+                    headers: { 'Content-type': 'application/json' },
+                    body: JSON.stringify({ email: signupEmail, resend: true })
+                });
+                const rd = await readResponseData(resp);
+                showAuthMessage(rd.message || 'OTP resent', resp.ok ? 'success' : 'error');
+                // Clear boxes and restart timer on successful resend
+                if(resp.ok) {
+                    otpBoxes.forEach(b => b.value = '');
+                    otpBoxes[0].focus();
+                    startTimer();
+                }
+            } catch (err) {
+                showAuthMessage('Unable to resend OTP right now.', 'error');
+            }
+        });
+    }
+
+    if(backToRegisterButton) {
+        backToRegisterButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if(timerInterval) {
+                clearInterval(timerInterval);
+            }
+            pendingRegisterEmail = signupEmail || document.querySelector('#otpEmailInput')?.value || '';
+            populateRegister();
+        });
+    }
+}
+
+function initialiseNamePage() {
+    const nameForm = document.querySelector('.name-form');
+
+    if(nameForm) {
+        nameForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(nameForm);
+            const data = Object.fromEntries(formData.entries());
+            const endpoint = nameForm.dataset.endpoint || '/auth/complete-profile';
+            const successRedirect = nameForm.dataset.successRedirect || '/user/dashboard';
+
+            showAuthMessage('');
+            const submitButton = nameForm.querySelector('button[type="submit"]');
+            if(submitButton) submitButton.disabled = true;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const responseData = await readResponseData(response);
+                const message = responseData.message || responseData.error || '';
+
+                if(response.ok) {
+                    showAuthMessage(message || 'Profile completed', 'success');
+                    // redirect to dashboard
+                    window.location.replace(responseData.redirectUrl || successRedirect);
+                    return;
+                }
+
+                showAuthMessage(message || 'Could not complete profile', 'error');
+            } catch (err) {
+                showAuthMessage('Unable to complete profile right now. Please try again.', 'error');
+            } finally {
+                if(submitButton) submitButton.disabled = false;
+            }
+        });
+    }
 }

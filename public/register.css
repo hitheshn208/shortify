@@ -107,6 +107,17 @@ body::before {
   line-height: 1.5;
 }
 
+.otp-email-display {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-gray);
+}
+
+.otp-email-display span {
+  color: var(--ink-900);
+  font-weight: 700;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -227,6 +238,118 @@ input[type="password"]:focus {
   outline: none;
   border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px rgba(15, 99, 220, 0.1);
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  color: var(--ink-900);
+  background: var(--white);
+  transition: all 0.2s ease;
+}
+
+input[type="text"]::placeholder {
+  color: #9ca3af;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(15, 99, 220, 0.1);
+}
+
+.otp-form input[name="otp"] {
+  text-align: center;
+  letter-spacing: 0.35em;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.otp-inputs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.otp-box {
+  width: 45px;
+  height: 50px;
+  padding: 0;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  border: 2px solid var(--border-gray);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink-900);
+  font-family: 'Courier New', monospace;
+  transition: all 0.2s ease;
+  caret-color: var(--primary-blue);
+}
+
+.otp-box:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(15, 99, 220, 0.1);
+}
+
+.otp-box::placeholder {
+  color: #d1d5db;
+  opacity: 1;
+}
+
+.otp-form .auth-footer,
+.name-form .auth-footer {
+  margin-top: 4px;
+}
+
+.otp-form .auth-footer a {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.otp-form .auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.resend-link {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.resend-link:hover {
+  text-decoration: underline;
+}
+
+.resend-link:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.resend-timer {
+  display: inline-block;
+  margin-left: 4px;
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 45px;
+}
+
+.resend-timer.hidden {
+  display: none;
+}
+
+.name-form input[name="name"] {
+  font-size: 15px;
 }
 
 .checkbox-group {
@@ -390,6 +513,29 @@ input[type="password"]:focus {
   font-weight: 500;
 }
 
+.auth-back-link {
+  margin-top: 14px;
+  border: none;
+  background: transparent;
+  color: var(--primary-blue);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+}
+
+.auth-back-link:hover {
+  color: var(--primary-indigo);
+}
+
+.auth-back-link:focus {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .switch-link {
   color: var(--primary-blue);
   cursor: pointer;
@@ -422,7 +568,6 @@ input[type="password"]:focus {
   }
 }
 
-}
 
 .register-container .mainHeading {
   font-family: var(--font-display);

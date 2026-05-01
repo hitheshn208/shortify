@@ -10,12 +10,14 @@ exports.findUserByEmail = async (email)=>{
     }
 }
 
-exports.registerUser = async (email, hashedPassword)=>{
+exports.registerUser = async (email, name)=>{
     try{
-        const result = await db.query("INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING *", [email, hashedPassword]);
-        return result.rows[0]
+        const otpUser = await db.query("DELETE FROM otps WHERE email = $1 RETURNING *", [email]);
+        const {hashed_password} = otpUser.rows[0];
+        const result = await db.query("INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING *", [email, hashed_password, name]);
+        return result.rows[0];
     }catch(e){
-        console.log("Error while querying in findUserByEmail ", e);
+        console.log("Error while querying in registerUser ", e);
         return;
     }
 }
@@ -141,5 +143,49 @@ exports.resetClick = async (id, userId)=>{
     }catch(e){
         console.log("Error while querying in resetClick ", e);
         return false;
+    }
+}
+
+exports.insertOtp = async(email, PasswordHash, otp)=>{
+    try{
+        await db.query(`INSERT INTO otps (email, hashed_password, otp)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (email)
+            DO UPDATE SET
+            otp = EXCLUDED.otp,
+            hashed_password = EXCLUDED.hashed_password,
+            created_at = NOW()`, [email, PasswordHash, otp]);
+    }catch(e){
+        console.log("Error while querying in insertOtp ", e);
+        return false;
+    }
+}
+
+exports.removeOtp = async (email)=>{
+    try{
+        await db.query("DELETE FROM otps WHERE email = $1",[email]);
+        return;
+    }catch(e){
+        console.log("Error while querying in removeOtp ", e);
+        return false;
+    }
+}
+
+exports.getOtpOfUser = async(email)=>{
+    try{
+        const result = await db.query("SELECT email, hashed_password, otp, created_at FROM otps WHERE email = $1", [email]);
+        return result.rows;
+    }catch(e){
+        console.log("Error while querying in getOtpOfUser ", e);
+        return false;
+    }
+}
+
+exports.updateOtp = async(email, newotp)=>{
+    try{
+        await db.query("UPDATE otps SET otp = $1, created_at = NOW() WHERE email = $2", [newotp, email])
+    }catch(e){
+        console.log("Error while querying in updateOtp ", e);
+        return;
     }
 }

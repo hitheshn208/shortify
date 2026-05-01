@@ -1,5 +1,6 @@
 const { fetchOriginalUrl, updateClick,fetchUrlPassword,} = require("../model/userModel");
 const bcrypt = require("bcrypt");
+
 exports.redirectPage = async (req, res, next)=>{
     const shortCode = req.params.code;
     console.log("Came inside ", shortCode)

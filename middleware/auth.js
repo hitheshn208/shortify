@@ -23,8 +23,8 @@ exports.authMiddleware = (req, res, next)=>{
 }
 
 exports.checkAuth = (req, res, next)=>{
-    if(req.path !== "/") return next();
-
+    // if(req.path !== "/") return next();
+    console.log("Came to check auth");
     const token = req.cookies.token
 
     if(token)

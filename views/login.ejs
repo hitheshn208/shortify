@@ -76,6 +76,67 @@
         </div>
     </template>
 
+    <template id="otpTemplate">
+        <div class="auth-wrapper">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1 class="mainHeading">Verify Your Email</h1>
+                    <p class="subHeading">We've sent a 6-digit code to your email. Enter it below to continue.</p>
+                    <p class="otp-email-display">Code sent to <span id="otpEmailText">your email</span></p>
+                </div>
+
+                <div class="auth-message" id="authMessage" aria-live="polite"></div>
+
+                <form class="auth-form otp-form" data-endpoint="/auth/verify-otp">
+                    <input type="hidden" name="email" id="otpEmailInput">
+                    <div class="form-group">
+                        <label>OTP Code</label>
+                        <div class="otp-inputs">
+                            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" placeholder="0" required>
+                            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" placeholder="0" required>
+                            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" placeholder="0" required>
+                            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" placeholder="0" required>
+                            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" placeholder="0" required>
+                            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" placeholder="0" required>
+                        </div>
+                        <input type="hidden" name="otp" id="otpCombined">
+                    </div>
+
+                    <button type="submit" class="auth-button primary-button">Verify Code</button>
+                </form>
+
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <p class="auth-footer">Didn't receive the code? <a href="#" id="resendOtp" class="resend-link">Resend</a><span id="resendTimer" class="resend-timer"></span></p>
+                <button type="button" id="backToRegister" class="auth-back-link">Change email</button>
+            </div>
+        </div>
+    </template>
+
+    <template id="nameTemplate">
+        <div class="auth-wrapper">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1 class="mainHeading">Tell us about you</h1>
+                    <p class="subHeading">Enter your name to finish setting up your account.</p>
+                </div>
+
+                <div class="auth-message" id="authMessage" aria-live="polite"></div>
+
+                <form class="auth-form name-form" data-endpoint="/auth/complete-profile" data-success-redirect="/user/dashboard">
+                    <input type="hidden" name="email" id="nameEmailInput">
+                    <div class="form-group">
+                        <label for="nameInput">Full Name</label>
+                        <input type="text" name="name" id="nameInput" placeholder="Your full name" required>
+                    </div>
+
+                    <button type="submit" class="auth-button primary-button">Continue to Dashboard</button>
+                </form>
+            </div>
+        </div>
+    </template>
     <template id="registerTemplate">
         <div class="auth-wrapper">
             <div class="auth-card">
