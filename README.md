@@ -22,6 +22,7 @@ Shortify is a full‑stack URL shortener that lets you create short links, manag
 ### Frontend
 - **EJS** (templating)
 - **HTML / CSS**
+- **JAVASCRIPT**
 
 ### Backend
 - **Node.js**
