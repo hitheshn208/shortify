@@ -1,4 +1,6 @@
-# Shortify
+# Shortify <img src="public/assets/logo_favicon.png" alt="Shortify logo" width="36" style="vertical-align: middle;" />
+
+**Live:** https://shortify.h208.me
 
 ![Shortify](https://img.shields.io/badge/Shortify-URL%20Shortener-brightgreen)
 
