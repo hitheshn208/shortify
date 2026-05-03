@@ -1,58 +1,68 @@
-# Shortify
+# Shortify <img src="public/assets/logo_favicon.png" alt="Shortify logo" width="36" style="vertical-align: middle;" />
+
+**Live:** https://shortify.h208.me
 
 ![Shortify](https://img.shields.io/badge/Shortify-URL%20Shortener-brightgreen)
 
-Shortify is a URL shortener web app that allows users to transform long URLs into shorter, more manageable links.
+Shortify is a full‑stack URL shortener that lets you create short links, manage them from a dashboard, and track link analytics.
 
 ## Features
-- Create shortened URLs from long URLs
-- User-friendly interface
-- View analytics on your shortened URLs
-- URL expiration options
+- Shorten long URLs into 6‑character short links
+- User authentication (signup/login)
+- Email OTP verification during signup
+- Dashboard to manage all your links
+- Basic analytics (visit / click count per link)
+- Password‑protected short links (protected links show a password prompt before redirecting)
+- Edit destination URL for an existing short link
+- Enable/disable password protection on an existing short link
+- Reset click count
+- Delete a short link
 
 ## Tech Stack
-- **JavaScript**
-- **EJS**
-- **CSS**
-- **HTML**
+### Frontend
+- **EJS** (templating)
+- **HTML / CSS**
+- **Javascript**
 
-## Local Setup Instructions
-To set up the project locally, follow these steps:
+### Backend
+- **Node.js**
+- **Express.js**
+- **PostgreSQL** (`pg`)
+- **JWT** authentication (stored in HTTP‑only cookies)
+- **bcrypt** (password hashing)
+- **Nodemailer** (email OTP)
+
+## Local Setup
 
 1. Clone the repository:
    ```bash
    git clone https://github.com/hitheshn208/shortify.git
    ```
-   
+
 2. Navigate into the project directory:
    ```bash
    cd shortify
    ```
 
-3. Install the required dependencies:
+3. Install dependencies:
    ```bash
    npm install
    ```
 
-4. Set up your environment variables. Create a `.env` file in the root directory and add your variables:
-   ```
-   PORT=your_port_here
-   DATABASE_URL=your_database_url_here
-   ```
+4. Create your environment file:
+   - Copy `.env.example` to `.env`
+   - Fill in the required values
 
-5. Run the application:
+5. Start the server:
    ```bash
-   npm start
+   npm run dev
    ```
 
-## Deployment Link
-You can access the live version of Shortify at: [https://shortify.h208.me](https://shortify.h208.me)
+## Deployment
+Live: [https://shortify.h208.me](https://shortify.h208.me)
 
 ## Usage
-To shorten a URL, simply enter your long URL into the provided form and click "Shorten." Your new short URL will be generated instantly!
-
-## Contributing
-We welcome contributions! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+1. Create an account and verify your email via OTP.
+2. From the dashboard, paste a long URL and generate a short link.
+3. (Optional) Enable password protection for the link.
+4. Share the short URL and track visits from the dashboard.
