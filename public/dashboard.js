@@ -46,7 +46,7 @@ function setCopyFeedback(message = "") {
 }
 
 function getBaseUrl() {
-    return "https://shortify.h208.me";
+    return "shortify.h208.me";
 }
 
 function toNumber(value) {
@@ -147,7 +147,7 @@ function createLinkCard(urlItem) {
     `;
     clickCount.textContent = `${toNumber(urlItem.visit_count)} Clicks`;
 
-    cardNode.dataset.detailUrl = `${getBaseUrl()}/${urlItem.short_code}/details`;
+    cardNode.dataset.detailUrl = `/user/${urlItem.short_code}/details`; ///user/${url.short_code}/details
     return cardNode;
 }
 
