@@ -19,7 +19,7 @@ exports.redirectPage = async (req, res, next)=>{
     {
         const clickUpdated = await updateClick(shortCode);
         if(!clickUpdated) {
-            console.log("Warning: Failed to update click count for:", shortCode);
+            // console.log("Warning: Failed to update click count for:", shortCode);
         }
         res.redirect(url.original_url);
     }
@@ -50,7 +50,7 @@ exports.verifyPassword = async (req, res)=>{
     {
         const clickUpdated = await updateClick(shortCode);
         if(!clickUpdated) {
-            console.log("Warning: Failed to update click count for:", shortCode);
+            // console.log("Warning: Failed to update click count for:", shortCode);
         }
         if(wantsJson)
             return res.json({ redirectUrl: url.original_url });

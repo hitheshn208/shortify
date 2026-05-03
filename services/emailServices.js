@@ -21,7 +21,7 @@ exports.sendOtp = (to, otp)=>{
         subject: "Your OTP Code - Shortify",
         html: Message
     })
-    console.log("Email Sent ", otp);
+    // console.log("Email Sent ", otp);
 }
 
 function createMessage(otp)
