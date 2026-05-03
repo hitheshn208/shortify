@@ -1,4 +1,7 @@
 const jwt = require("jsonwebtoken");
+const dotenv  = require("dotenv");
+const path = require("path");
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 exports.authMiddleware = (req, res, next)=>{
     const token = req.cookies.token;
@@ -9,7 +12,7 @@ exports.authMiddleware = (req, res, next)=>{
     }
 
     try{
-        const decoded = jwt.verify(token, "secretKey");
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
         req.email = decoded.email;
         req.id =decoded.id;
         // console.log(req.email, req.id, decoded, "successful")

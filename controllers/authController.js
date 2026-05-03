@@ -3,6 +3,9 @@ const bcrypt = require("bcrypt");
 const { findUserByEmail, registerUser, insertOtp, removeOtp, getOtpOfUser, updateOtp } = require("../model/userModel")
 const {getOtp} = require("../utils/otpGenerator");
 const {sendOtp} = require("../services/emailServices");
+const dotenv  = require("dotenv");
+const path = require("path");
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 async function hashPassword(password){
     const saltRound = 5;
@@ -31,7 +34,7 @@ exports.signupPost = async (req, res)=>{
     //*If user changes the email after requesting otp remove old tuple
     if(token)
     {
-        const decoded = jwt.verify(token, "secretKey");
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
         if(email !== decoded.email){
             // console.log("OTP Removed");  
             await removeOtp(email);
@@ -43,7 +46,7 @@ exports.signupPost = async (req, res)=>{
     await insertOtp(email, PasswordHash, Hashed_otp);
     sendOtp(email, otp);
     try{
-        const token = jwt.sign({email},"secretKey");
+        const token = jwt.sign({email},process.env.SECRET_KEY);
         res.cookie("temp-token", token, {
             httpOnly: true,
             secure: false,
@@ -73,7 +76,7 @@ exports.loginpost = async (req, res)=>{                                         
     }
 
     try{
-        const token = jwt.sign({id: user.id, email: user.email},"secretKey");
+        const token = jwt.sign({id: user.id, email: user.email},process.env.SECRET_KEY);
         res.cookie("token", token, {
             httpOnly: true,
             secure: false,
@@ -113,7 +116,7 @@ exports.verifyOtp = async (req, res)=>{
     const {otp} = req.body;
     // console.log("In verify ", otp);
 
-    const decoded = jwt.verify(token, "secretKey");
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
     const userEmail = decoded.email;
     // console.log(userEmail);
 
@@ -146,7 +149,7 @@ exports.resendOtp = async(req, res)=>{
     if(!token || !resend)
         return res.status(401).json({ message : "Unauthorized"});
     try{
-        const decoded = jwt.verify(token, "secretKey");
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
         const userEmail = decoded.email;
         const newotp = getOtp();
         const Hashed_otp = await hashPassword(newotp);
@@ -163,13 +166,13 @@ exports.resendOtp = async(req, res)=>{
 exports.completeProfile = async (req, res)=>{
     try{
         const tempToken = req.cookies["temp-token"];
-        const decoded = jwt.verify(tempToken, "secretKey");
+        const decoded = jwt.verify(tempToken, process.env.SECRET_KEY);
         const userEmail = decoded.email;
         const {name} = req.body;
         const user = await registerUser(userEmail, name);
         res.clearCookie("temp-token");
 
-        const token = jwt.sign({id: user.id, email: user.email},"secretKey");
+        const token = jwt.sign({id: user.id, email: user.email},process.env.SECRET_KEY);
         res.cookie("token", token, {
             httpOnly: true,
             secure: false,
