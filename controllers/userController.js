@@ -83,7 +83,7 @@ exports.editSecurity = async(req, res)=>{
 exports.zeroClick = async(req, res)=>{
     const { id } = req.body;
     const shortCode = req.params.code;
-    const userId = req.body;
+    const userId = req.id;
 
     if(!await resetClick(id, shortCode, userId))
         return res.status(501).send("Internal server error");
