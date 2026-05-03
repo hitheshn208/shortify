@@ -15,10 +15,10 @@ app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static("public"));
 
-app.use((req, res, next)=>{
-    console.log("Request came to ", req.path, req.method);
-    next();
-})
+// app.use((req, res, next)=>{
+//     console.log("Request came to ", req.path, req.method);
+//     next();
+// })
 
 app.get("/favicon.ico", (req, res, next)=>{
     res.status(204);

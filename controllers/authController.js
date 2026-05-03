@@ -24,7 +24,7 @@ exports.signupPost = async (req, res)=>{
     const availableUser = await findUserByEmail(email);
 
     if(availableUser.length !== 0){
-        console.log("Already registered ",availableUser)
+        // console.log("Already registered ",availableUser)
         return res.status(401).json({ message: "This email is already registered. Please sign in instead." });
     }
 
@@ -33,7 +33,7 @@ exports.signupPost = async (req, res)=>{
     {
         const decoded = jwt.verify(token, "secretKey");
         if(email !== decoded.email){
-            console.log("OTP Removed");
+            // console.log("OTP Removed");  
             await removeOtp(email);
         }
     }
@@ -49,10 +49,10 @@ exports.signupPost = async (req, res)=>{
             secure: false,
             sameSite: "strict"
         })
-        console.log("Temp Cookie set");
+        // console.log("Temp Cookie set");
         return res.sendStatus(201);
     }catch(e){
-        console.log("Error ", e);
+        // console.log("Error ", e);
         return res.status(500).json({ message: "Internal server error." });
     }
 }
@@ -61,14 +61,14 @@ exports.loginpost = async (req, res)=>{                                         
     const {email, password} = req.body;
     const availableUser = await findUserByEmail(email);
     if(availableUser.length === 0){
-        console.log("No user")
+        // console.log("No user")
         return res.status(401).json({ message: "No account found for this email. Please sign up first." });
     }
     const user = availableUser[0];
-    console.log(user);
+    // console.log(user);
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if(!isMatch){
-        console.log("Password mismatch");
+        // console.log("Password mismatch");
         return res.status(401).json({ message: "Incorrect password. Please try again." });
     }
 
@@ -79,19 +79,19 @@ exports.loginpost = async (req, res)=>{                                         
             secure: false,
             sameSite: "strict"
         })
-        console.log("Cookie set");
+        // console.log("Cookie set");
         return res.status(200).json({
             message: "Login successful.",
             redirectUrl: "/user/dashboard"
         });
     }catch(e){
-        console.log("Error ", e);
+        // console.log("Error ", e);
         return res.status(500).json({ message: "Internal server error." });
     }
 }
 
 exports.logoutUser = (req, res)=>{
-    console.log("User logged out");
+    // console.log("User logged out");
     res.clearCookie("token");
     return res.json({
         redirectUrl: "/" 
@@ -111,11 +111,11 @@ function checkExpired(time)
 exports.verifyOtp = async (req, res)=>{
     const token = req.cookies["temp-token"];
     const {otp} = req.body;
-    console.log("In verify ", otp);
+    // console.log("In verify ", otp);
 
     const decoded = jwt.verify(token, "secretKey");
     const userEmail = decoded.email;
-    console.log(userEmail);
+    // console.log(userEmail);
 
     const availableUser = await getOtpOfUser(userEmail);
     if(availableUser.length === 0)
@@ -156,7 +156,7 @@ exports.resendOtp = async(req, res)=>{
             message: "OTP resent"
         })
     }catch(e){
-        console.log("Error while verifying token");
+        // console.log("Error while verifying token");
         return res.sendStatus(401);
     }
 }
@@ -175,7 +175,7 @@ exports.completeProfile = async (req, res)=>{
             secure: false,
             sameSite: "strict"
         })
-        console.log("Cookie set in complete profile");
+        // console.log("Cookie set in complete profile");
         return res.status(200).json({
             message: "Login successful.",
             redirectUrl: "/user/dashboard"

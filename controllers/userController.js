@@ -22,8 +22,8 @@ const getUniqueCode = async ()=>{
 }
 
 exports.shortenUrl = async (req, res)=>{
-    console.log("User Id to shorten ", req.id);
-    console.log(req.body);
+    // console.log("User Id to shorten ", req.id);
+    // console.log(req.body);
     const { originalUrl, passwordProtected, password } = req.body;
     let HashedPassword;
     if(passwordProtected)
@@ -58,11 +58,11 @@ exports.editOriginalUrl = async (req, res)=>{
     const { id , newUrl } = req.body;
     const userId = req.id;
     try{
-        console.log("Came to edit")
+        // console.log("Came to edit")
         await updateOriginalUrl(id, newUrl, userId);
         return res.sendStatus(204);
     }catch(e){
-        console.log(e);
+        // console.log(e);
         return res.sendStatus(400);
     }
 }
@@ -94,11 +94,11 @@ exports.zeroClick = async(req, res)=>{
 exports.removeUrl = async(req, res)=>{
     const shortCode = req.params.code;
     const userId = req.id;
-    console.log(shortCode)
+    // console.log(shortCode)
     if(!shortCode)
         res.sendStatus(400);
     const row = await deleteUrl(shortCode, userId);
-    console.log(row);
-    console.log("Success");
+    // console.log(row);
+    // console.log("Success");
     return res.sendStatus(204);
 }

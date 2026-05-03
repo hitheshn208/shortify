@@ -79,10 +79,16 @@ exports.fetchOriginalUrl = async (shortCode)=>{
 
 exports.updateClick = async (shortCode)=>{
     try{
-        const result = await db.query("UPDATE urls SET visit_count = visit_count + 1 WHERE short_code = $1", [shortCode])
+        const result = await db.query("UPDATE urls SET visit_count = visit_count + 1 WHERE short_code = $1", [shortCode]);
+        if(result.rowCount === 0) {
+            console.log("No URL found with short_code:", shortCode);
+            return false;
+        }
+        console.log("Click count updated for:", shortCode);
+        return true;
     }catch(e){
         console.log("Error while querying in updateClick ", e);
-        return;
+        return false;
     }
 }
 

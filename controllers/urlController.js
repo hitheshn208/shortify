@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 
 exports.redirectPage = async (req, res, next)=>{
     const shortCode = req.params.code;
-    console.log("Came inside ", shortCode)
+    // console.log("Came inside ", shortCode)
     if (!/^[A-Za-z]{6}$/.test(shortCode)) 
         return next(); 
 
@@ -17,21 +17,24 @@ exports.redirectPage = async (req, res, next)=>{
         res.redirect(`/${shortCode}/verify`);
     else
     {
-        await updateClick(shortCode);
+        const clickUpdated = await updateClick(shortCode);
+        if(!clickUpdated) {
+            console.log("Warning: Failed to update click count for:", shortCode);
+        }
         res.redirect(url.original_url);
     }
 }
 
 exports.redirectPassword = async (req, res, next)=>{
     const Shortcode = req.params.code;
-    console.log("Came to redirect page ", Shortcode)
+    // console.log("Came to redirect page ", Shortcode)
     res.render("verifyPassword" , {Shortcode});
 }
 
 exports.verifyPassword = async (req, res)=>{
     const shortCode = req.params.code;
     const { password } = req.body;
-    console.log("Came to verify ", password);
+    // console.log("Came to verify ", password);
     const availableUrls = await fetchUrlPassword(shortCode);
     if(!availableUrls.length)
         return res.status(404).json({ message: "Link not found" });
@@ -45,7 +48,10 @@ exports.verifyPassword = async (req, res)=>{
 
     if(isMatch)
     {
-        await updateClick(shortCode);
+        const clickUpdated = await updateClick(shortCode);
+        if(!clickUpdated) {
+            console.log("Warning: Failed to update click count for:", shortCode);
+        }
         if(wantsJson)
             return res.json({ redirectUrl: url.original_url });
 
