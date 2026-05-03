@@ -142,9 +142,9 @@ exports.deleteUrl = async (short_code, userId)=>{
     }
 }
 
-exports.resetClick = async (id, userId)=>{
+exports.resetClick = async (id, shortCode, userId)=>{
     try{
-        await db.query("UPDATE urls SET visit_count = 0 WHERE id = $1 AND user_id = $2", [id, userId]);
+        await db.query("UPDATE urls SET visit_count = 0 WHERE id = $1 AND user_id = $2 AND short_code = $3", [id, userId, shortCode]);
         return true;
     }catch(e){
         console.log("Error while querying in resetClick ", e);
