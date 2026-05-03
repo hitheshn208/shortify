@@ -1,4 +1,4 @@
-# Shortify <img src="public/assets/logo_favicon.png" alt="Shortify logo" width="36" style="vertical-align: middle;" />
+# <img src="public/assets/logo_favicon.png" alt="Shortify logo" width="30" style="vertical-align: middle;" /> Shortify 
 
 **Live:** https://shortify.h208.me
 
