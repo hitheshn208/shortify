@@ -46,7 +46,7 @@ function setCopyFeedback(message = "") {
 }
 
 function getBaseUrl() {
-    return "http://localhost:3000";
+    return "https://shortify.h208.me";
 }
 
 function toNumber(value) {

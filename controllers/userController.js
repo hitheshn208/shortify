@@ -50,7 +50,7 @@ exports.showLinkDetails = async (req, res, next)=>{
         return next();
 
     const url = availableUrls[0];
-    url.short_url = `http://localhost:3000/${shortCode}`;
+    url.short_url = `shortify.h208.me/${shortCode}`;
     res.render("linkdetails", {url, user});
 }
 
