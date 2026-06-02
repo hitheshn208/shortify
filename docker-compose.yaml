@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres
+    networks:
+    - pg-net
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+    - postgres_data:/var/lib/postgresql
+
+  pgadmin4:
+    image: dpage/pgadmin4
+    networks: 
+    - pg-net
+    ports:
+    - 5050:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    
+  app:
+    image: shortify:1.2
+    networks:
+    - pg-net
+    ports:
+    - 8000:3000
+
+volumes:
+  postgres_data:
+networks:
+  pg-net:
