@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require("cookie-parser");
 const {authMiddleware, checkAuth} = require("./middleware/auth")
 const { redirectPage } = require("./controllers/urlController")
+const redisClient = require("./config/redis");
 
 const app = express();
 const authRouter = require("./routes/authRoutes");
@@ -24,6 +25,7 @@ app.get("/favicon.ico", (req, res, next)=>{
     res.status(204);
 })
 
+
 app.use("/auth", authRouter);
 app.use("/user",authMiddleware, userRouter);
 app.use("/:code", urlRouter);
@@ -35,9 +37,23 @@ app.use((req, res)=>{
 });
 
 const PORT = 3000;
-app.listen(PORT, (e)=>{
-    if(e)
-        console.log("Error while starting the server.\n Error : ", e);
-    else
-        console.log(`Server is online: http://localhost:${PORT}`);
-})
+
+async function startServer() {
+    try{
+        await redisClient.connect();
+        console.log("Redis Connected");
+        
+        app.listen(PORT, (e)=>{
+            if(e)
+                console.log("Error while starting the server.\n Error : ", e);
+            else
+                console.log(`Server is online: http://localhost:${PORT}`);
+        })
+        
+    } catch (e) {
+        console.error("Failed to connect Redis:", e);
+    }
+}
+
+startServer();
+

@@ -1,10 +1,12 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { findUserByEmail, registerUser, insertOtp, removeOtp, getOtpOfUser, updateOtp } = require("../model/userModel")
+const { findUserByEmail, registerUser } = require("../model/userModel");
+const { insertOtp, removeOtp, getOtpOfUser, refreshCredential, updateOtp, getPassword} = require("../model/redisuserModel")
 const {getOtp} = require("../utils/otpGenerator");
 const {sendOtp} = require("../services/emailServices");
 const dotenv  = require("dotenv");
 const path = require("path");
+const { log } = require("console");
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 async function hashPassword(password){
@@ -22,7 +24,7 @@ exports.sendSignupPage = (req, res)=>{
 }
 
 exports.signupPost = async (req, res)=>{
-    const token = req.cookies["temp-token"];
+    const token = req.cookies["temp-token"]; //*Will be available if user changes email
     const {email, password} = req.body;
     const availableUser = await findUserByEmail(email);
 
@@ -31,19 +33,17 @@ exports.signupPost = async (req, res)=>{
         return res.status(401).json({ message: "This email is already registered. Please sign in instead." });
     }
 
-    //*If user changes the email after requesting otp remove old tuple
+    //*If user changes the email after requesting otp remove old
     if(token)
     {
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
         if(email !== decoded.email){
-            // console.log("OTP Removed");  
-            await removeOtp(email);
+            await removeOtp( decoded.email);
         }
     }
     const PasswordHash = await hashPassword(password);
     const otp = getOtp();
-    const Hashed_otp = await hashPassword(otp);
-    await insertOtp(email, PasswordHash, Hashed_otp);
+    await insertOtp(email, PasswordHash, otp);
     sendOtp(email, otp);
     try{
         const token = jwt.sign({email},process.env.SECRET_KEY);
@@ -118,28 +118,20 @@ exports.verifyOtp = async (req, res)=>{
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
     const userEmail = decoded.email;
-    // console.log(userEmail);
+    console.log(userEmail);
 
-    const availableUser = await getOtpOfUser(userEmail);
-    if(availableUser.length === 0)
-        return res.status(401).json({
-            message: "OTP not generated"   //*Check Exists
-        })
-
-    const userOtp = availableUser[0];
-
-    const isExpired = checkExpired(userOtp.created_at);
-    if(isExpired)
+    const storedOtp = await getOtpOfUser(userEmail);
+    if(!storedOtp)
         return res.status(401).json({
             message: "OTP has expired"   //*OTP Expired
         })
 
-    const isMatch = await bcrypt.compare(otp, userOtp.otp);
-    if(!isMatch)
+    if(storedOtp !== Number(otp))
         return res.status(401).json({
             message: "OTP doesn't match"   //*OTP don't match
         })
 
+    await refreshCredential(userEmail);
     res.sendStatus(201);
 }
 
@@ -152,8 +144,7 @@ exports.resendOtp = async(req, res)=>{
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
         const userEmail = decoded.email;
         const newotp = getOtp();
-        const Hashed_otp = await hashPassword(newotp);
-        await updateOtp(userEmail, Hashed_otp);
+        await updateOtp(userEmail, newotp);
         sendOtp(userEmail, newotp);
         res.json({
             message: "OTP resent"
@@ -168,8 +159,10 @@ exports.completeProfile = async (req, res)=>{
         const tempToken = req.cookies["temp-token"];
         const decoded = jwt.verify(tempToken, process.env.SECRET_KEY);
         const userEmail = decoded.email;
+        const password_hash = await getPassword(userEmail);
         const {name} = req.body;
-        const user = await registerUser(userEmail, name);
+        log
+        const user = await registerUser(userEmail, password_hash, name);
         res.clearCookie("temp-token");
 
         const token = jwt.sign({id: user.id, email: user.email},process.env.SECRET_KEY);
@@ -185,6 +178,7 @@ exports.completeProfile = async (req, res)=>{
         });
 
     }catch(e){
+        console.log(e)
         res.status(401).json({
             message: "Failed to complete profile",
             redirectUrl: "/auth/signup"
