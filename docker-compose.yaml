@@ -8,18 +8,14 @@ services:
     volumes:
     - postgres_data:/var/lib/postgresql
 
-  pgadmin4:
-    image: dpage/pgadmin4
-    networks: 
-    - pg-net
-    ports:
-    - 5050:80
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  redis:
+    image: redis
+    networks:
+      - pg-net
     
   app:
-    image: shortify:1.2
+    build : .
+    image: shortify:latest
     networks:
     - pg-net
     ports:
