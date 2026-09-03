@@ -1,18 +1,28 @@
+const { getLink, insertLink } = require("../model/redisuserModel");
 const { fetchOriginalUrl, updateClick,fetchUrlPassword,} = require("../model/userModel");
 const bcrypt = require("bcrypt");
 
 exports.redirectPage = async (req, res, next)=>{
     const shortCode = req.params.code;
-    // console.log("Came inside ", shortCode)
     if (!/^[A-Za-z]{6}$/.test(shortCode)) 
         return next(); 
 
-    const availableUrls = await fetchOriginalUrl(shortCode);
+    let url = null;
 
-    if(availableUrls.length === 0)
-        return next();
-    
-    const url = availableUrls[0];
+    const cached = await getLink(shortCode);
+
+    if(cached){
+        url = JSON.parse(cached);
+        console.log("Cache hit");
+    }else{
+        console.log("Cache miss");
+        const availableUrls = await fetchOriginalUrl(shortCode);
+        if(availableUrls.length === 0)
+            return next();
+        url = availableUrls[0];
+        await insertLink(shortCode, url.original_url, url.is_protected);
+    }
+
     if(url.is_protected)
         res.redirect(`/${shortCode}/verify`);
     else
@@ -34,7 +44,6 @@ exports.redirectPassword = async (req, res, next)=>{
 exports.verifyPassword = async (req, res)=>{
     const shortCode = req.params.code;
     const { password } = req.body;
-    // console.log("Came to verify ", password);
     const availableUrls = await fetchUrlPassword(shortCode);
     if(!availableUrls.length)
         return res.status(404).json({ message: "Link not found" });

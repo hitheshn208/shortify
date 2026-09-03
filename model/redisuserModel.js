@@ -61,3 +61,28 @@ exports.getPassword = async (email) =>{
         console.log("Redis error in getOtpOfUser ", error);
     }
 }
+
+exports.getLink = async(code)=>{
+    try {
+        const cached = await redisClient.get(`url@${code}`);
+        return cached;
+    } catch (error) {
+        console.log("Redis error in getLink ", error);
+    }
+}
+
+exports.insertLink = async (code, url, isProtected)=>{
+    try {
+        await redisClient.set(`url@${code}`, 
+            JSON.stringify({
+                original_url: url,
+                is_protected: isProtected
+            }),
+            {
+                EX: 60*60
+            }
+        )
+    } catch (error) {
+        console.log("Redis error in insertLink ", error);
+    }
+}
