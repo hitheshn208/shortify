@@ -9,7 +9,7 @@ exports.insertOtp = async(email, hashed_password, otp)=>{
             EX: 300
         });
     } catch (e) {
-        console.log("Redis error in insertOtp ", e);
+        // console.log("Redis error in insertOtp ", e);
     }
 }
 
@@ -18,7 +18,7 @@ exports.removeOtp = async (email)=>{
         await redisClient.del(`pwd@${email}`);
         await redisClient.del(`otp@${email}`);
     } catch (error) {
-        console.log("Redis error in removeOtp ", error);
+        // console.log("Redis error in removeOtp ", error);
     }
 }
 
@@ -28,7 +28,7 @@ exports.getOtpOfUser = async (email) =>{
         console.log(Number(otp))
         return Number(otp);
     } catch (error) {
-        console.log("Redis error in getOtpOfUser ", error);
+        // console.log("Redis error in getOtpOfUser ", error);
     }
 }
 
@@ -36,7 +36,7 @@ exports.refreshCredential = async (email)=>{
     try {
         await redisClient.expire(`pwd@${email}`, 1800);
     } catch (error) {
-        console.log("Redis error in refreshCredential ", error);
+        // console.log("Redis error in refreshCredential ", error);
     }
 }
 
@@ -47,7 +47,7 @@ exports.updateOtp = async(email, otp)=>{
             EX: 300
         });
     } catch (e) {
-        console.log("Redis error in updateOtp ", e);
+        // console.log("Redis error in updateOtp ", e);
     }
 }
 
@@ -58,6 +58,40 @@ exports.getPassword = async (email) =>{
         await redisClient.del(`otp@${email}`);
         return password;
     } catch (error) {
-        console.log("Redis error in getOtpOfUser ", error);
+        // console.log("Redis error in getOtpOfUser ", error);
+    }
+}
+
+exports.getLink = async(code)=>{
+    try {
+        const cached = await redisClient.get(`url@${code}`);
+        return cached;
+    } catch (error) {
+        // console.log("Redis error in getLink ", error);
+    }
+}
+
+exports.insertLink = async (code, url, isProtected, url_password)=>{
+    try {
+        await redisClient.set(`url@${code}`, 
+            JSON.stringify({
+                original_url: url,
+                is_protected: isProtected,
+                url_password: url_password
+            }),
+            {
+                EX: 60*60
+            }
+        )
+    } catch (error) {
+        // console.log("Redis error in insertLink ", error);
+    }
+}
+
+exports.invalidateCacheLink = async (code)=>{
+    try{
+        await redisClient.del(`url@${code}`);
+    } catch (error) {
+        // console.log("Redis error in invalidateLink ", error);
     }
 }

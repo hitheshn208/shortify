@@ -1,6 +1,7 @@
 const { customAlphabet } = require("nanoid");
 const { checkCode, registerCode, findUserById, fetchAllUrls, fetchLinkDetails, updateOriginalUrl, updateSecurity, resetClick, deleteUrl } = require("../model/userModel")
 const {hashPassword} = require("../utils/hashPassword");
+const { insertLink, invalidateCacheLink } = require("../model/redisuserModel");
 
 exports.showDashboardpage = async (req, res)=>{
     const user = await findUserById(req.id);
@@ -33,6 +34,7 @@ exports.shortenUrl = async (req, res)=>{
 
     const shortCode = await getUniqueCode();
     const url = await registerCode(req.id, originalUrl, shortCode, passwordProtected, HashedPassword);
+    await insertLink(url.short_code, url.original_url, url.is_protected, url.url_password);
     res.json({
         original_url: url.original_url,
         short_code : url.short_code,
@@ -55,10 +57,12 @@ exports.showLinkDetails = async (req, res, next)=>{
 }
 
 exports.editOriginalUrl = async (req, res)=>{
+    const shortCode = req.params.code;
     const { id , newUrl } = req.body;
     const userId = req.id;
     try{
         // console.log("Came to edit")
+        await invalidateCacheLink(shortCode);
         await updateOriginalUrl(id, newUrl, userId);
         return res.sendStatus(204);
     }catch(e){
@@ -68,8 +72,10 @@ exports.editOriginalUrl = async (req, res)=>{
 }
 
 exports.editSecurity = async(req, res)=>{
+    const shortCode = req.params.code;
     const { id, isProtected, password } = req.body;
     const userId = req.id;
+    await invalidateCacheLink(shortCode);
     if(!isProtected)
     {
         await updateSecurity(id, userId, isProtected, null);
@@ -97,6 +103,7 @@ exports.removeUrl = async(req, res)=>{
     // console.log(shortCode)
     if(!shortCode)
         res.sendStatus(400);
+    await invalidateCacheLink(shortCode);
     const row = await deleteUrl(shortCode, userId);
     // console.log(row);
     // console.log("Success");
