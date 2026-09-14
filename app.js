@@ -1,7 +1,7 @@
 const express = require('express');
 const cookieParser = require("cookie-parser");
+const path = require("path");
 const {authMiddleware, checkAuth} = require("./middleware/auth")
-const { redirectPage } = require("./controllers/urlController")
 const redisClient = require("./config/redis");
 
 const app = express();
@@ -33,7 +33,7 @@ app.use("/", checkAuth, publicRouter);
 
 
 app.use((req, res)=>{
-    res.send("<h1>Page not Found</h1>");
+    res.sendFile(path.join(__dirname, "./views/error.html"));
 });
 
 const PORT = 3000;

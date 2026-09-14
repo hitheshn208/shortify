@@ -13,14 +13,12 @@ exports.redirectPage = async (req, res, next)=>{
 
     if(cached){
         url = JSON.parse(cached);
-        console.log("Cache hit");
     }else{
-        console.log("Cache miss");
         const availableUrls = await fetchOriginalUrl(shortCode);
         if(availableUrls.length === 0)
             return next();
         url = availableUrls[0];
-        await insertLink(shortCode, url.original_url, url.is_protected);
+        await insertLink(shortCode, url.original_url, url.is_protected, url.url_password);
     }
 
     if(url.is_protected)
@@ -41,18 +39,23 @@ exports.redirectPassword = async (req, res, next)=>{
     res.render("verifyPassword" , {Shortcode});
 }
 
-exports.verifyPassword = async (req, res)=>{
+exports.verifyPassword = async (req, res, next)=>{
     const shortCode = req.params.code;
     const { password } = req.body;
-    const availableUrls = await fetchUrlPassword(shortCode);
-    if(!availableUrls.length)
-        return res.status(404).json({ message: "Link not found" });
 
-    const url = availableUrls[0];
+    let url = JSON.parse(await getLink(shortCode));
+    let isMatch = false;
+    if(!url){
+        const availableUrls = await fetchUrlPassword(shortCode);
+        if(!availableUrls.length)
+            return next()
+        url = availableUrls[0];
+    }
+
     if(!url.url_password)
         return res.status(400).json({ message: "Password is not set for this link" });
 
-    const isMatch = await bcrypt.compare(password, url.url_password);
+    isMatch = await bcrypt.compare(password, url.url_password);
     const wantsJson = req.xhr || (req.headers.accept && req.headers.accept.includes("application/json"));
 
     if(isMatch)

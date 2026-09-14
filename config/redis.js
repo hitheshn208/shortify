@@ -4,7 +4,7 @@ const path = require('path');
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const redisClient = createClient({
-    url: `redis://${process.env.REDIS_HOST}:6379`
+    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
 });
 
 redisClient.on("error", (err)=>{

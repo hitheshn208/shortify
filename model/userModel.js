@@ -15,7 +15,7 @@ exports.registerUser = async (email, password_hash, name)=>{
         const result = await db.query("INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING *", [email, password_hash, name]);
         return result.rows[0];
     }catch(e){
-        console.log("Error while querying in registerUser ", e);
+        // console.log("Error while querying in registerUser ", e);
         return;
     }
 }
@@ -67,7 +67,7 @@ exports.registerCode = async (userId, orginalUrl, shortCode, passwordProtected, 
 
 exports.fetchOriginalUrl = async (shortCode)=>{
     try{
-        const result = await db.query("SELECT original_url, is_protected FROM urls WHERE short_code = $1", [shortCode]);
+        const result = await db.query("SELECT original_url, is_protected, url_password FROM urls WHERE short_code = $1", [shortCode]);
         return result.rows;
     }catch(e){
         // console.log("Error while querying in fetchOriginalUrl ", e);
