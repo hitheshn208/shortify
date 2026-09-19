@@ -208,7 +208,7 @@ function initialiseRegisterPage() {
     passwordInput = document.querySelector("#passwordInput");
     passwordvisibility = document.querySelector("#visibility");
     
-    // const googleSignupBtn = document.querySelector("#googleSignupBtn");  //^Google register button here
+    const googleSignupBtn = document.querySelector("#googleSignupBtn");  //^Google register button 
     switchAuth = document.querySelector("#switchAuth");
 
     if(!passwordInput || !passwordvisibility) {
